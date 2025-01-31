@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
+	"github.com/educates/educates-training-platform/client-programs/pkg/cluster"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"github.com/educates/educates-training-platform/client-programs/pkg/cluster"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -16,6 +16,7 @@ import (
 type ClusterConfigViewOptions struct {
 	KubeconfigOptions
 	Portal       string
+	Hostname     string
 	Capacity     uint
 	Password     string
 	ThemeName    string
@@ -46,7 +47,7 @@ func (o *ClusterConfigViewOptions) Run(isPasswordSet bool) error {
 
 	// Update the training portal, creating it if necessary.
 
-	err = createTrainingPortal(dynamicClient, o.Portal, o.Capacity, o.Password, isPasswordSet, o.ThemeName, o.CookieDomain, o.Labels)
+	err = createTrainingPortal(dynamicClient, o.Portal, o.Hostname, o.Capacity, o.Password, isPasswordSet, o.ThemeName, o.CookieDomain, o.Labels)
 
 	if err != nil {
 		return err
@@ -88,6 +89,12 @@ func (p *ProjectInfo) NewClusterPortalCreateCmd() *cobra.Command {
 		"educates-cli",
 		"name to be used for training portal and workshop name prefixes",
 	)
+	c.Flags().StringVar(
+		&o.Hostname,
+		"hostname",
+		"",
+		"override hostname for training portal and workshops",
+	)
 	c.Flags().UintVar(
 		&o.Capacity,
 		"capacity",
@@ -123,7 +130,7 @@ func (p *ProjectInfo) NewClusterPortalCreateCmd() *cobra.Command {
 	return c
 }
 
-func createTrainingPortal(client dynamic.Interface, portal string, capacity uint, password string, isPasswordSet bool, themeName string, cookieDomain string, labels []string) error {
+func createTrainingPortal(client dynamic.Interface, portal string, hostname string, capacity uint, password string, isPasswordSet bool, themeName string, cookieDomain string, labels []string) error {
 	trainingPortalClient := client.Resource(trainingPortalResource)
 
 	_, err := trainingPortalClient.Get(context.TODO(), portal, metav1.GetOptions{})
@@ -187,6 +194,11 @@ func createTrainingPortal(client dynamic.Interface, portal string, capacity uint
 					}{
 						Reserved: 0,
 					},
+				},
+				"ingress": struct {
+					Hostname string `json:"hostname"`
+				}{
+					Hostname: hostname,
 				},
 				"theme": struct {
 					Name string `json:"name"`
