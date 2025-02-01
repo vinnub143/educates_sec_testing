@@ -110,7 +110,7 @@ directories:
       - path: .
         githubRelease:
           slug: carvel-dev/kapp-controller
-          tag: v0.52.0
+          tag: v0.55.0
           disableAutoChecksumValidation: true
         includePaths:
           - release.yml
