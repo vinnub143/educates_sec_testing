@@ -17,6 +17,7 @@ type ClusterConfigViewOptions struct {
 	KubeconfigOptions
 	Portal       string
 	Hostname     string
+	Repository   string
 	Capacity     uint
 	Password     string
 	ThemeName    string
@@ -47,7 +48,7 @@ func (o *ClusterConfigViewOptions) Run(isPasswordSet bool) error {
 
 	// Update the training portal, creating it if necessary.
 
-	err = createTrainingPortal(dynamicClient, o.Portal, o.Hostname, o.Capacity, o.Password, isPasswordSet, o.ThemeName, o.CookieDomain, o.Labels)
+	err = createTrainingPortal(dynamicClient, o.Portal, o.Hostname, o.Repository, o.Capacity, o.Password, isPasswordSet, o.ThemeName, o.CookieDomain, o.Labels)
 
 	if err != nil {
 		return err
@@ -95,6 +96,12 @@ func (p *ProjectInfo) NewClusterPortalCreateCmd() *cobra.Command {
 		"",
 		"override hostname for training portal and workshops",
 	)
+	c.Flags().StringVar(
+		&o.Repository,
+		"image-repository",
+		"",
+		"the address of the default image repository",
+	)
 	c.Flags().UintVar(
 		&o.Capacity,
 		"capacity",
@@ -130,7 +137,7 @@ func (p *ProjectInfo) NewClusterPortalCreateCmd() *cobra.Command {
 	return c
 }
 
-func createTrainingPortal(client dynamic.Interface, portal string, hostname string, capacity uint, password string, isPasswordSet bool, themeName string, cookieDomain string, labels []string) error {
+func createTrainingPortal(client dynamic.Interface, portal string, hostname string, registry string, capacity uint, password string, isPasswordSet bool, themeName string, cookieDomain string, labels []string) error {
 	trainingPortalClient := client.Resource(trainingPortalResource)
 
 	_, err := trainingPortalClient.Get(context.TODO(), portal, metav1.GetOptions{})
@@ -164,6 +171,25 @@ func createTrainingPortal(client dynamic.Interface, portal string, hostname stri
 		})
 	}
 
+	type RegistryDetails struct {
+		Host      string `json:"host"`
+		Namespace string `json:"namespace"`
+	}
+
+	registryHost := ""
+	registryNamespace := ""
+
+	if registry != "" {
+		parts := strings.SplitN(registry, "/", 2)
+
+		registryHost = parts[0]
+
+		if len(parts) > 1 {
+			registryNamespace = parts[1]
+		}
+
+	}
+
 	trainingPortal.SetUnstructuredContent(map[string]interface{}{
 		"apiVersion": "training.educates.dev/v1beta1",
 		"kind":       "TrainingPortal",
@@ -190,9 +216,14 @@ func createTrainingPortal(client dynamic.Interface, portal string, hostname stri
 				},
 				"workshop": map[string]interface{}{
 					"defaults": struct {
-						Reserved int `json:"reserved"`
+						Reserved int             `json:"reserved"`
+						Registry RegistryDetails `json:"registry"`
 					}{
 						Reserved: 0,
+						Registry: RegistryDetails{
+							Host:      registryHost,
+							Namespace: registryNamespace,
+						},
 					},
 				},
 				"ingress": struct {
