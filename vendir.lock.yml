@@ -56,8 +56,8 @@ directories:
   path: carvel-packages/installer/bundle/config/ytt/_ytt_lib/packages/external-dns/upstream
 - contents:
   - githubRelease:
-      tag: v0.52.0
-      url: https://api.github.com/repos/carvel-dev/kapp-controller/releases/155438864
+      tag: v0.55.0
+      url: https://api.github.com/repos/carvel-dev/kapp-controller/releases/193854415
     path: .
   path: carvel-packages/installer/bundle/config/ytt/_ytt_lib/packages/kapp-controller/upstream
 kind: LockConfig
