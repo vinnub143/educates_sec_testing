@@ -12,3 +12,11 @@ New Features
 * Added `--image-repository` option to set the default image repository to be
   used used by all workshops, unless overridden for a specific workshop, when
   creating a portal using the `educates create-portal` command.
+
+Bugs Fixed
+----------
+
+* When using a touch device such as iPhone/iPad and a clickable action was run,
+  the on screen keyboard would pop up when not desriable. The keyboard is now
+  not displayed, but the terminal the clickable action was running a command in
+  or where text was pasted, will still show as having had focus.
