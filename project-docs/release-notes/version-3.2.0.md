@@ -13,6 +13,15 @@ New Features
   used used by all workshops, unless overridden for a specific workshop, when
   creating a portal using the `educates create-portal` command.
 
+* User details from the training portal are now saved to a `Secret` stored in
+  the workshop namespace for each session, with a name of the form
+  `$(session_name)-user`. Attributes are `username`, `first_name`, `last_name`
+  and `email`. The secret can be used as a volume or as source of environment
+  variables for the workshop session container, with caveat that since the
+  secret is only available at the point a workshop session is allocated, it
+  should not be used with reserved sessions. These are also available to use as
+  data variables in `request.objects`.
+
 Bugs Fixed
 ----------
 
