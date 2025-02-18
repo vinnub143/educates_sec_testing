@@ -29,3 +29,11 @@ Bugs Fixed
   the on screen keyboard would pop up when not desriable. The keyboard is now
   not displayed, but the terminal the clickable action was running a command in
   or where text was pasted, will still show as having had focus.
+
+* The `secure` property was missing in the `Workshop` CRD for `ingresses` even
+  though was documented that existed.
+
+* When proxying in the workshop gateway process, the HTTP `Host` header was
+  sent in lower case. This is allowed by HTTP specification as meant to be case
+  insensitive, but some web services were only accepting mixed case, so use the
+  mixed case convention so better chance of working with broken web services.
