@@ -329,12 +329,12 @@ RUN <<EOF
 EOF
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=2.9.0
-    CHECKSUM_amd64="7eed2d7fe4c1a53f385d0b24c50fc08941a09ac37b44705ad7997a6635c27e84"
-    CHECKSUM_arm64="2655f412582c1b0e84f6822c273b8d8d14df427598fd760a6311ed1280942051"
+    SKAFFOLD_VERSION=2.14.1
+    CHECKSUM_amd64="e66836d51a0898ad618409404a9adfa045594a3c0234143c5d34e78f0e12c7c1"
+    CHECKSUM_arm64="ef92ae3015d5331cabaee384b24fdd950f5c84c6729beb2604f2b637f6f535d8"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /opt/kubernetes/bin/skaffold https://github.com/GoogleContainerTools/skaffold/releases/download/v${VERSION}/skaffold-linux-${TARGETARCH}
+    set -eo pipefail
+    curl --silent --fail -L -o /opt/kubernetes/bin/skaffold https://github.com/GoogleContainerTools/skaffold/releases/download/v${SKAFFOLD_VERSION}/skaffold-linux-${TARGETARCH}
     echo "${!CHECKSUM} /opt/kubernetes/bin/skaffold" | sha256sum --check --status
     chmod +x /opt/kubernetes/bin/skaffold
 EOF
