@@ -197,9 +197,9 @@ EOF
 
 RUN <<EOF
     set -eo pipefail
-    VERSION=0.29.1
-    CHECKSUM_amd64="b7ed81a8952a5520a1a6978c3cf68b1fd555d928a444c63d4b826ae6fbb6d9ff"
-    CHECKSUM_arm64="f9dbd1ff1cd26d851c8ac695decbc4ceea97f2a87ccfa16ff805ab5f49ae9b81"
+    VERSION=0.40.5
+    CHECKSUM_amd64="63dcf6817b2c391ccb4a8b7ee313f5990f5accfa0e55a72c769b73c303a03e01"
+    CHECKSUM_arm64="3e3c852b3f7604c14e96dfb56b869769c2c314fdad8d4c35ab158c738c516a22"
     CHECKSUM=CHECKSUM_${TARGETARCH}
     curl --silent --fail -L -o /tmp/k9s.tar.gz https://github.com/derailed/k9s/releases/download/v${VERSION}/k9s_Linux_${TARGETARCH}.tar.gz
     echo "${!CHECKSUM} /tmp/k9s.tar.gz" | sha256sum --check --status
