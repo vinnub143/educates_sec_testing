@@ -340,12 +340,12 @@ RUN <<EOF
 EOF
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=5.3.0
-    CHECKSUM_amd64="3ab32f92360d752a2a53e56be073b649abc1e7351b912c0fb32b960d1def854c"
-    CHECKSUM_arm64="a1ec622d4adeb483e3cdabd70f0d66058b1e4bcec013c4f74f370666e1e045d8"
+    KUSTOMIZE_VERSION=5.6.0
+    CHECKSUM_amd64="54e4031ddc4e7fc59e408da29e7c646e8e57b8088c51b84b3df0864f47b5148f"
+    CHECKSUM_arm64="ad8ab62d4f6d59a8afda0eec4ba2e5cd2f86bf1afeea4b78d06daac945eb0660"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /tmp/kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v${VERSION}/kustomize_v${VERSION}_linux_${TARGETARCH}.tar.gz
+    set -eo pipefail
+    curl --silent --fail -L -o /tmp/kustomize.tar.gz https://github.com/kubernetes-sigs/kustomize/releases/download/kustomize/v${KUSTOMIZE_VERSION}/kustomize_v${KUSTOMIZE_VERSION}_linux_${TARGETARCH}.tar.gz
     echo "${!CHECKSUM} /tmp/kustomize.tar.gz" | sha256sum --check --status
     tar -C /opt/kubernetes/bin -zxvf /tmp/kustomize.tar.gz kustomize
     rm /tmp/kustomize.tar.gz
