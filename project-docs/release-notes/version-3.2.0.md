@@ -36,7 +36,7 @@ Features Changed
   version now created by `educates create-cluster` command will be 1.32.
 
 * Updated versions of numerous bundled applications, including Docker, Helm,
-  Hugo, Carvel tools, `dive`, `yq`, `k9s`.
+  Hugo, Carvel tools, `dive`, `yq`, `k9s`, `skaffold`, `kustomize`.
 
 Bugs Fixed
 ----------
