@@ -38,6 +38,8 @@ Features Changed
 * Updated versions of numerous bundled applications, including Docker, Helm,
   Hugo, Carvel tools, `dive`, `yq`, `k9s`, `skaffold`, `kustomize`.
 
+* Update bundled VS Code Server to version 1.97.2.
+
 Bugs Fixed
 ----------
 

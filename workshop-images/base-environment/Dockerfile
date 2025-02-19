@@ -354,13 +354,13 @@ EOF
 # VS Code editor and dashboard extension.
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=4.89.1
-    CHECKSUM_amd64="5c3769b1ab5cbb2eceb092524dc46f558905e4260155b477d3a313f9ea25ca33"
-    CHECKSUM_arm64="69d3d1f7158d6e2125bd2f831611ab959a2aa80d5a7d96422a44070eb2b8645b"
+    CODE_VERSION=4.97.2
+    CHECKSUM_amd64="c7d5e389be56e54d300ef60610a4c877fe54cf62f0df4bb6fc2e3f04618009eb"
+    CHECKSUM_arm64="e60578f9c628a2296a20e9e4d4142559e850ac934bb7e7985425c095557a9212"
     CHECKSUM=CHECKSUM_${TARGETARCH}
+    set -eo pipefail
     mkdir /opt/editor
-    curl --silent --fail -L -o /tmp/code-server.tar.gz https://github.com/cdr/code-server/releases/download/v${VERSION}/code-server-${VERSION}-linux-${TARGETARCH}.tar.gz
+    curl --silent --fail -L -o /tmp/code-server.tar.gz https://github.com/cdr/code-server/releases/download/v${CODE_VERSION}/code-server-${CODE_VERSION}-linux-${TARGETARCH}.tar.gz
     echo "${!CHECKSUM} /tmp/code-server.tar.gz" | sha256sum --check --status
     cd /opt/editor
     tar -zxf /tmp/code-server.tar.gz --strip-components=1
