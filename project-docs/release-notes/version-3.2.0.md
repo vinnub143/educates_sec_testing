@@ -32,6 +32,9 @@ Features Changed
   1.32. From now on the intent is that only clients for supported Kubernetes
   versions will be included. The `kubectl-convert` plugin is now also included.
 
+* Updated `kind` version bundled with `educates` CLI. Default Kubernetes cluster
+  version now created by `educates create-cluster` command will be 1.32.
+
 * Updated versions of numerous bundled applications, including Docker, Helm,
   Hugo, `dive`, `yq`.
 
