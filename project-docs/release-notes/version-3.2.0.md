@@ -28,7 +28,8 @@ Features Changed
 * Workshop base images were updated to Fedora 41. This has also resulted in the
   Python version being updated to 3.13.
   
-* Updated versions of numerous bundled applications, include Docker, Helm.
+* Updated versions of numerous bundled applications, including Docker, Helm,
+  `dive`.
 
 Bugs Fixed
 ----------

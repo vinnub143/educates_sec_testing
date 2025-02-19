@@ -89,10 +89,10 @@ echo "09cd14a34f17d88cd4f0d2b73e0bbd0bf56984be21bc947f416a7824a709011e /tmp/git-
     go mod download && \
     go build -o git-serve cmd/git-serve/main.go
 
-RUN curl --silent --fail -L -o /tmp/dive.tar.gz https://github.com/wagoodman/dive/archive/refs/tags/v0.11.0.tar.gz && \
-    echo "e91d3ce4b2dd292a72effea9c7dbde0f92a05f29a4e4c89fd46ed1d7f6aaed97 /tmp/dive.tar.gz" | sha256sum --check --status && \
+RUN curl --silent --fail -L -o /tmp/dive.tar.gz https://github.com/wagoodman/dive/archive/refs/tags/v0.12.0.tar.gz && \
+    echo "2b69b8d28220c66e2575a782a370a0c05077936ae3ce69180525412fcca09230 /tmp/dive.tar.gz" | sha256sum --check --status && \
     tar xvf /tmp/dive.tar.gz && \
-    cd dive-0.11.0 && \
+    cd dive-0.12.0 && \
     go mod download && \
     go build -o main main.go
 
@@ -141,7 +141,7 @@ RUN <<EOF
     rm /tmp/hugo.tar.gz
 EOF
 
-COPY --from=builder-image /app/dive-0.11.0/main /usr/local/bin/dive
+COPY --from=builder-image /app/dive-0.12.0/main /usr/local/bin/dive
 
 # Kubernetes tools.
 
