@@ -29,7 +29,7 @@ Features Changed
   Python version being updated to 3.13.
   
 * Updated versions of numerous bundled applications, including Docker, Helm,
-  `dive`, `yq`.
+  Hugo, `dive`, `yq`.
 
 Bugs Fixed
 ----------

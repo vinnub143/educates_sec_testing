@@ -130,9 +130,9 @@ EOF
 
 RUN <<EOF
     set -eo pipefail
-    VERSION=0.121.1
-    CHECKSUM_amd64="348997284f405abee2a84634525a4e1298b710bbf5bdf5dea30bfc0b1c9aeba5"
-    CHECKSUM_arm64="60973296797730b13febc491db3f966f227d8e4d1ff244bdfbb323923abef0c7"
+    VERSION=0.144.1
+    CHECKSUM_amd64="8ff8490aa292e1d56121e9a6ce7bd1623e98b3b0f0c652a4a5035316f100a0d2"
+    CHECKSUM_arm64="b6529d6ec236ee7d09018462a456a2cda17e4db21b6551a4224edad9cc2808b9"
     CHECKSUM=CHECKSUM_${TARGETARCH}
     curl --silent --fail -L -o /tmp/hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v${VERSION}/hugo_${VERSION}_linux-${TARGETARCH}.tar.gz
     echo "${!CHECKSUM} /tmp/hugo.tar.gz" | sha256sum --check --status
