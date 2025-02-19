@@ -2,7 +2,7 @@
 
 FROM kubernetesui/dashboard:v2.7.0 AS k8s-console
 
-FROM fedora:39 AS system-base
+FROM fedora:41 AS system-base
 
 RUN HOME=/root && \
     INSTALL_PKGS=" \
@@ -52,7 +52,7 @@ RUN HOME=/root && \
         zlib-devel \
     " && \
     dnf install -y dnf-plugins-core && \
-    dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo && \
+    dnf-3 config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo && \
     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1 && \
     dnf install https://rpm.nodesource.com/pub_16.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm -y && \
     curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo && \
@@ -313,9 +313,9 @@ EOF
 
 RUN <<EOF
     set -eo pipefail
-    VERSION=3.13.3
-    CHECKSUM_amd64="bbb6e7c6201458b235f335280f35493950dcd856825ddcfd1d3b40ae757d5c7d"
-    CHECKSUM_arm64="44aaa094ae24d01e8c36e327e1837fd3377a0f9152626da088384c5bc6d94562"
+    VERSION=3.17.1
+    CHECKSUM_amd64="3b66f3cd28409f29832b1b35b43d9922959a32d795003149707fea84cbcd4469"
+    CHECKSUM_arm64="c86c9b23602d4abbfae39d9634e25ab1d0ea6c4c16c5b154113efe316a402547"
     CHECKSUM=CHECKSUM_${TARGETARCH}
     curl --silent --fail -L -o /tmp/helm.tar.gz https://get.helm.sh/helm-v${VERSION}-linux-${TARGETARCH}.tar.gz
     echo "${!CHECKSUM} /tmp/helm.tar.gz" | sha256sum --check --status

@@ -22,6 +22,14 @@ New Features
   should not be used with reserved sessions. These are also available to use as
   data variables in `request.objects`.
 
+Features Changed
+----------------
+
+* Workshop base images were updated to Fedora 41. This has also resulted in the
+  Python version being updated to 3.13.
+  
+* Updated versions of numerous bundled applications, include Helm.
+
 Bugs Fixed
 ----------
 
