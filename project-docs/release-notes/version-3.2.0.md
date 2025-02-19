@@ -27,7 +27,11 @@ Features Changed
 
 * Workshop base images were updated to Fedora 41. This has also resulted in the
   Python version being updated to 3.13.
-  
+
+* Versions of `kubectl` provided in the workshop image are now 1.30, 1.31 and
+  1.32. From now on the intent is that only clients for supported Kubernetes
+  versions will be included. The `kubectl-convert` plugin is now also included.
+
 * Updated versions of numerous bundled applications, including Docker, Helm,
   Hugo, `dive`, `yq`.
 
