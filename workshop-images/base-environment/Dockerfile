@@ -107,34 +107,34 @@ COPY --from=k8s-console / /opt/console/
 # Miscellaneous tools.
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=1.2.6
+    BOMBARDIER_VERSION=1.2.6
     CHECKSUM_amd64="c29be68fb6711434d50d8c25bc5ce08d33d8265871e6e1a518b3775e530fbb9b"
     CHECKSUM_arm64="3064a2c7639b8f4c682895cbd8f7791c272200066d68837591e3204988cd6190"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /usr/local/bin/bombardier https://github.com/codesenberg/bombardier/releases/download/v${VERSION}/bombardier-linux-${TARGETARCH}
+    set -eo pipefail
+    curl --silent --fail -L -o /usr/local/bin/bombardier https://github.com/codesenberg/bombardier/releases/download/v${BOMBARDIER_VERSION}/bombardier-linux-${TARGETARCH}
     echo "${!CHECKSUM}  /usr/local/bin/bombardier" | sha256sum --check --status
     chmod +x /usr/local/bin/bombardier
 EOF
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=4.45.1
+    YQ_VERSION=4.45.1
     CHECKSUM_amd64="654d2943ca1d3be2024089eb4f270f4070f491a0610481d128509b2834870049"
     CHECKSUM_arm64="ceea73d4c86f2e5c91926ee0639157121f5360da42beeb8357783d79c2cc6a1d"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v${VERSION}/yq_linux_${TARGETARCH}
+    set -eo pipefail
+    curl --silent --fail -L -o /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_${TARGETARCH}
     echo "${!CHECKSUM} /usr/local/bin/yq" | sha256sum --check --status
     chmod +x /usr/local/bin/yq
 EOF
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=0.144.1
+    HUGO_VERSION=0.144.1
     CHECKSUM_amd64="8ff8490aa292e1d56121e9a6ce7bd1623e98b3b0f0c652a4a5035316f100a0d2"
     CHECKSUM_arm64="b6529d6ec236ee7d09018462a456a2cda17e4db21b6551a4224edad9cc2808b9"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /tmp/hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v${VERSION}/hugo_${VERSION}_linux-${TARGETARCH}.tar.gz
+    set -eo pipefail
+    curl --silent --fail -L -o /tmp/hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_linux-${TARGETARCH}.tar.gz
     echo "${!CHECKSUM} /tmp/hugo.tar.gz" | sha256sum --check --status
     cd /usr/local/bin
     tar -zxf /tmp/hugo.tar.gz hugo
