@@ -317,12 +317,12 @@ RUN <<EOF
 EOF
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=3.17.1
+    HELM_VERSION=3.17.1
     CHECKSUM_amd64="3b66f3cd28409f29832b1b35b43d9922959a32d795003149707fea84cbcd4469"
     CHECKSUM_arm64="c86c9b23602d4abbfae39d9634e25ab1d0ea6c4c16c5b154113efe316a402547"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /tmp/helm.tar.gz https://get.helm.sh/helm-v${VERSION}-linux-${TARGETARCH}.tar.gz
+    set -eo pipefail
+    curl --silent --fail -L -o /tmp/helm.tar.gz https://get.helm.sh/helm-v${HELM_VERSION}-linux-${TARGETARCH}.tar.gz
     echo "${!CHECKSUM} /tmp/helm.tar.gz" | sha256sum --check --status
     tar -C /opt/kubernetes/bin --strip-components 1 -zxvf /tmp/helm.tar.gz linux-${TARGETARCH}/helm
     rm /tmp/helm.tar.gz
