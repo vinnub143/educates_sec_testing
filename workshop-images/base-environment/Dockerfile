@@ -2,7 +2,7 @@
 
 FROM kubernetesui/dashboard:v2.7.0 AS k8s-console
 
-FROM fedora:39 AS system-base
+FROM fedora:41 AS system-base
 
 RUN HOME=/root && \
     INSTALL_PKGS=" \
@@ -52,15 +52,16 @@ RUN HOME=/root && \
         zlib-devel \
     " && \
     dnf install -y dnf-plugins-core && \
-    dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo && \
+    dnf-3 config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo && \
     PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=1 && \
-    dnf install https://rpm.nodesource.com/pub_16.x/nodistro/repo/nodesource-release-nodistro-1.noarch.rpm -y && \
+    curl -fsSL https://rpm.nodesource.com/setup_20.x | bash - && \
     curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | tee /etc/yum.repos.d/yarn.repo && \
     dnf install -y --setopt=tsflags=nodocs --setopt=nodesource-nodejs.module_hotfixes=1 $INSTALL_PKGS && \
     dnf clean -y --enablerepo='*' all && \
     sed -i.bak -e '1i auth requisite pam_deny.so' /etc/pam.d/su && \
     sed -i.bak -e 's/^%wheel/# %wheel/' /etc/sudoers && \
-    useradd -u 1001 -g 0 -M -d /home/eduk8s eduk8s && \
+    groupadd -g 2375 docker-sock && \
+    useradd -u 1001 -g 0 -M -G docker-sock -d /home/eduk8s eduk8s && \
     mkdir -p /home/eduk8s && \
     chown -R 1001:0 /home/eduk8s && \
     chmod -R g=u /home/eduk8s && \
@@ -88,10 +89,10 @@ echo "09cd14a34f17d88cd4f0d2b73e0bbd0bf56984be21bc947f416a7824a709011e /tmp/git-
     go mod download && \
     go build -o git-serve cmd/git-serve/main.go
 
-RUN curl --silent --fail -L -o /tmp/dive.tar.gz https://github.com/wagoodman/dive/archive/refs/tags/v0.11.0.tar.gz && \
-    echo "e91d3ce4b2dd292a72effea9c7dbde0f92a05f29a4e4c89fd46ed1d7f6aaed97 /tmp/dive.tar.gz" | sha256sum --check --status && \
+RUN curl --silent --fail -L -o /tmp/dive.tar.gz https://github.com/wagoodman/dive/archive/refs/tags/v0.12.0.tar.gz && \
+    echo "2b69b8d28220c66e2575a782a370a0c05077936ae3ce69180525412fcca09230 /tmp/dive.tar.gz" | sha256sum --check --status && \
     tar xvf /tmp/dive.tar.gz && \
-    cd dive-0.11.0 && \
+    cd dive-0.12.0 && \
     go mod download && \
     go build -o main main.go
 
@@ -106,88 +107,92 @@ COPY --from=k8s-console / /opt/console/
 # Miscellaneous tools.
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=1.2.6
+    BOMBARDIER_VERSION=1.2.6
     CHECKSUM_amd64="c29be68fb6711434d50d8c25bc5ce08d33d8265871e6e1a518b3775e530fbb9b"
     CHECKSUM_arm64="3064a2c7639b8f4c682895cbd8f7791c272200066d68837591e3204988cd6190"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /usr/local/bin/bombardier https://github.com/codesenberg/bombardier/releases/download/v${VERSION}/bombardier-linux-${TARGETARCH}
+    set -eo pipefail
+    curl --silent --fail -L -o /usr/local/bin/bombardier https://github.com/codesenberg/bombardier/releases/download/v${BOMBARDIER_VERSION}/bombardier-linux-${TARGETARCH}
     echo "${!CHECKSUM}  /usr/local/bin/bombardier" | sha256sum --check --status
     chmod +x /usr/local/bin/bombardier
 EOF
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=4.40.5
-    CHECKSUM_amd64="0d6aaf1cf44a8d18fbc7ed0ef14f735a8df8d2e314c4cc0f0242d35c0a440c95"
-    CHECKSUM_arm64="9431f0fa39a0af03a152d7fe19a86e42e9ff28d503ed4a70598f9261ec944a97"
+    YQ_VERSION=4.45.1
+    CHECKSUM_amd64="654d2943ca1d3be2024089eb4f270f4070f491a0610481d128509b2834870049"
+    CHECKSUM_arm64="ceea73d4c86f2e5c91926ee0639157121f5360da42beeb8357783d79c2cc6a1d"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v${VERSION}/yq_linux_${TARGETARCH}
+    set -eo pipefail
+    curl --silent --fail -L -o /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v${YQ_VERSION}/yq_linux_${TARGETARCH}
     echo "${!CHECKSUM} /usr/local/bin/yq" | sha256sum --check --status
     chmod +x /usr/local/bin/yq
 EOF
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=0.121.1
-    CHECKSUM_amd64="348997284f405abee2a84634525a4e1298b710bbf5bdf5dea30bfc0b1c9aeba5"
-    CHECKSUM_arm64="60973296797730b13febc491db3f966f227d8e4d1ff244bdfbb323923abef0c7"
+    HUGO_VERSION=0.144.1
+    CHECKSUM_amd64="8ff8490aa292e1d56121e9a6ce7bd1623e98b3b0f0c652a4a5035316f100a0d2"
+    CHECKSUM_arm64="b6529d6ec236ee7d09018462a456a2cda17e4db21b6551a4224edad9cc2808b9"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /tmp/hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v${VERSION}/hugo_${VERSION}_linux-${TARGETARCH}.tar.gz
+    set -eo pipefail
+    curl --silent --fail -L -o /tmp/hugo.tar.gz https://github.com/gohugoio/hugo/releases/download/v${HUGO_VERSION}/hugo_${HUGO_VERSION}_linux-${TARGETARCH}.tar.gz
     echo "${!CHECKSUM} /tmp/hugo.tar.gz" | sha256sum --check --status
     cd /usr/local/bin
     tar -zxf /tmp/hugo.tar.gz hugo
     rm /tmp/hugo.tar.gz
 EOF
 
-COPY --from=builder-image /app/dive-0.11.0/main /usr/local/bin/dive
+COPY --from=builder-image /app/dive-0.12.0/main /usr/local/bin/dive
 
 # Kubernetes tools.
 
 RUN mkdir -p /opt/kubernetes/bin
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=1.27.14
-    CHECKSUM_amd64="1d2431c68bb6dfa9de3cd40fd66d97a9ac73593c489f9467249eea43e9c16a1e"
-    CHECKSUM_arm64="29f3a1f520d929df38873c68dec73519c1e5e521140e01cf9d7701f7b5ffe4f3"
+    KUBECTL_VERSION=1.30.10
+    KUBECTL_SHORT_VERSION=$(echo ${KUBECTL_VERSION} | cut -d. -f1,2)
+    CHECKSUM_amd64="1d575cf29fc6514565ef76329f2b7008a3d7c7e7dfa853a70e9bd65784b653a3338260325c2a7bc8e80427cb3829bf6407aba6a39fb4bf73c30da775d3aad2c8"
+    CHECKSUM_arm64="3111d0842d92a1b26d6115d9346b780d3552732d46ee233f7ffb34122b50addb0717032cf85a6ff80317d0ad88e3b4fd7f16628cad2d7a53eadf971fa8da0244"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /opt/kubernetes/bin/kubectl@1.27 https://storage.googleapis.com/kubernetes-release/release/v${VERSION}/bin/linux/${TARGETARCH}/kubectl
-    echo "${!CHECKSUM} /opt/kubernetes/bin/kubectl@1.27" | sha256sum --check --status
-    chmod +x /opt/kubernetes/bin/kubectl@1.27
+    set -eo pipefail
+    curl --silent --fail -L -o /tmp/kubernetes-client-linux-${TARGETARCH}.tar.gz https://dl.k8s.io/v${KUBECTL_VERSION}/kubernetes-client-linux-${TARGETARCH}.tar.gz
+    echo "${!CHECKSUM} /tmp/kubernetes-client-linux-${TARGETARCH}.tar.gz" | sha512sum --check --status
+    tar -C /tmp -zxf /tmp/kubernetes-client-linux-${TARGETARCH}.tar.gz
+    mv /tmp/kubernetes/client/bin/kubectl /opt/kubernetes/bin/kubectl@${KUBECTL_SHORT_VERSION}
+    mv /tmp/kubernetes/client/bin/kubectl-convert /opt/kubernetes/bin/kubectl-convert@${KUBECTL_SHORT_VERSION}
+    rm -f /tmp/kubernetes-client-linux-${TARGETARCH}.tar.gz
+    rm -rf /tmp/kubernetes
 EOF
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=1.28.10
-    CHECKSUM_amd64="389c17a9700a4b01ebb055e39b8bc0886330497440dde004b5ed90f2a3a028db"
-    CHECKSUM_arm64="e659d23d442c2706debe5b96742326c0a1e1d7b5c695a9fe7dfe8ea7402caee8"
+    KUBECTL_VERSION=1.31.6
+    KUBECTL_SHORT_VERSION=$(echo ${KUBECTL_VERSION} | cut -d. -f1,2)
+    CHECKSUM_amd64="dd3d8723e7ff54aa4c8a1087d961c8f604b8dce5a6981357daea9b8e1882efbfaf9e226afc35cdc277e2ac06f6ef3bd9867c21158d9ae917d02ade7c245f8610"
+    CHECKSUM_arm64="6fef05cf595f6d10a355670b2509ae4aa85d036bb6793624e8a3362fbacc22825b410f852665b83c91c1e10c4d11a539ad8d695fc257808cd5198fd53c39a7be"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /opt/kubernetes/bin/kubectl@1.28 https://storage.googleapis.com/kubernetes-release/release/v${VERSION}/bin/linux/${TARGETARCH}/kubectl
-    echo "${!CHECKSUM} /opt/kubernetes/bin/kubectl@1.28" | sha256sum --check --status
-    chmod +x /opt/kubernetes/bin/kubectl@1.28
+    set -eo pipefail
+    curl --silent --fail -L -o /tmp/kubernetes-client-linux-${TARGETARCH}.tar.gz https://dl.k8s.io/v${KUBECTL_VERSION}/kubernetes-client-linux-${TARGETARCH}.tar.gz
+    echo "${!CHECKSUM} /tmp/kubernetes-client-linux-${TARGETARCH}.tar.gz" | sha512sum --check --status
+    tar -C /tmp -zxf /tmp/kubernetes-client-linux-${TARGETARCH}.tar.gz
+    mv /tmp/kubernetes/client/bin/kubectl /opt/kubernetes/bin/kubectl@${KUBECTL_SHORT_VERSION}
+    mv /tmp/kubernetes/client/bin/kubectl-convert /opt/kubernetes/bin/kubectl-convert@${KUBECTL_SHORT_VERSION}
+    rm -f /tmp/kubernetes-client-linux-${TARGETARCH}.tar.gz
+    rm -rf /tmp/kubernetes
 EOF
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=1.29.5
-    CHECKSUM_amd64="603c8681fc0d8609c851f9cc58bcf55eeb97e2934896e858d0232aa8d1138366"
-    CHECKSUM_arm64="9ee9168def12ac6a6c0c6430e0f73175e756ed262db6040f8aa2121ad2c1f62e"
+    KUBECTL_VERSION=1.32.2
+    KUBECTL_SHORT_VERSION=$(echo ${KUBECTL_VERSION} | cut -d. -f1,2)
+    CHECKSUM_amd64="0f27d1918088df6a672f42b13cf213acb5e7499db1b9db5191478adb2ca0c350ba8f5004ceee3798b0ff47fc358bf2fb37097c1113f603dbedd0d00ae0dbaf7f"
+    CHECKSUM_arm64="ad0af31c2845e80fcc1916b550b6047a42bd01971f5a20256d98bdd59b51d03061607898cf190365a484a169d411a5b3d46aa8365ec3e035fb98fd345fb04c09"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /opt/kubernetes/bin/kubectl@1.29 https://storage.googleapis.com/kubernetes-release/release/v${VERSION}/bin/linux/${TARGETARCH}/kubectl
-    echo "${!CHECKSUM} /opt/kubernetes/bin/kubectl@1.29" | sha256sum --check --status
-    chmod +x /opt/kubernetes/bin/kubectl@1.29
-EOF
-
-RUN <<EOF
     set -eo pipefail
-    VERSION=1.30.1
-    CHECKSUM_amd64="5b86f0b06e1a5ba6f8f00e2b01e8ed39407729c4990aeda961f83a586f975e8a"
-    CHECKSUM_arm64="d90446719b815e3abfe7b2c46ddf8b3fda17599f03ab370d6e47b1580c0e869e"
-    CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /opt/kubernetes/bin/kubectl@1.30 https://storage.googleapis.com/kubernetes-release/release/v${VERSION}/bin/linux/${TARGETARCH}/kubectl
-    echo "${!CHECKSUM} /opt/kubernetes/bin/kubectl@1.30" | sha256sum --check --status
-    chmod +x /opt/kubernetes/bin/kubectl@1.30
+    curl --silent --fail -L -o /tmp/kubernetes-client-linux-${TARGETARCH}.tar.gz https://dl.k8s.io/v${KUBECTL_VERSION}/kubernetes-client-linux-${TARGETARCH}.tar.gz
+    echo "${!CHECKSUM} /tmp/kubernetes-client-linux-${TARGETARCH}.tar.gz" | sha512sum --check --status
+    tar -C /tmp -zxf /tmp/kubernetes-client-linux-${TARGETARCH}.tar.gz
+    mv /tmp/kubernetes/client/bin/kubectl /opt/kubernetes/bin/kubectl@${KUBECTL_SHORT_VERSION}
+    mv /tmp/kubernetes/client/bin/kubectl-convert /opt/kubernetes/bin/kubectl-convert@${KUBECTL_SHORT_VERSION}
+    rm -f /tmp/kubernetes-client-linux-${TARGETARCH}.tar.gz
+    rm -rf /tmp/kubernetes
 EOF
 
 RUN <<EOF
@@ -313,9 +318,9 @@ EOF
 
 RUN <<EOF
     set -eo pipefail
-    VERSION=3.13.3
-    CHECKSUM_amd64="bbb6e7c6201458b235f335280f35493950dcd856825ddcfd1d3b40ae757d5c7d"
-    CHECKSUM_arm64="44aaa094ae24d01e8c36e327e1837fd3377a0f9152626da088384c5bc6d94562"
+    VERSION=3.17.1
+    CHECKSUM_amd64="3b66f3cd28409f29832b1b35b43d9922959a32d795003149707fea84cbcd4469"
+    CHECKSUM_arm64="c86c9b23602d4abbfae39d9634e25ab1d0ea6c4c16c5b154113efe316a402547"
     CHECKSUM=CHECKSUM_${TARGETARCH}
     curl --silent --fail -L -o /tmp/helm.tar.gz https://get.helm.sh/helm-v${VERSION}-linux-${TARGETARCH}.tar.gz
     echo "${!CHECKSUM} /tmp/helm.tar.gz" | sha256sum --check --status
