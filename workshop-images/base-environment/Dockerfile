@@ -119,9 +119,9 @@ EOF
 
 RUN <<EOF
     set -eo pipefail
-    VERSION=4.40.5
-    CHECKSUM_amd64="0d6aaf1cf44a8d18fbc7ed0ef14f735a8df8d2e314c4cc0f0242d35c0a440c95"
-    CHECKSUM_arm64="9431f0fa39a0af03a152d7fe19a86e42e9ff28d503ed4a70598f9261ec944a97"
+    VERSION=4.45.1
+    CHECKSUM_amd64="654d2943ca1d3be2024089eb4f270f4070f491a0610481d128509b2834870049"
+    CHECKSUM_arm64="ceea73d4c86f2e5c91926ee0639157121f5360da42beeb8357783d79c2cc6a1d"
     CHECKSUM=CHECKSUM_${TARGETARCH}
     curl --silent --fail -L -o /usr/local/bin/yq https://github.com/mikefarah/yq/releases/download/v${VERSION}/yq_linux_${TARGETARCH}
     echo "${!CHECKSUM} /usr/local/bin/yq" | sha256sum --check --status
