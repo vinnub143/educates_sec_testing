@@ -60,7 +60,8 @@ RUN HOME=/root && \
     dnf clean -y --enablerepo='*' all && \
     sed -i.bak -e '1i auth requisite pam_deny.so' /etc/pam.d/su && \
     sed -i.bak -e 's/^%wheel/# %wheel/' /etc/sudoers && \
-    useradd -u 1001 -g 0 -M -d /home/eduk8s eduk8s && \
+    groupadd -g 2375 docker-sock && \
+    useradd -u 1001 -g 0 -M -G docker-sock -d /home/eduk8s eduk8s && \
     mkdir -p /home/eduk8s && \
     chown -R 1001:0 /home/eduk8s && \
     chmod -R g=u /home/eduk8s && \
