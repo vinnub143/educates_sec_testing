@@ -209,78 +209,78 @@ RUN <<EOF
 EOF
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=0.46.3
-    CHECKSUM_amd64="2b4ca5365c343bb1e903e8e845d9750b5d2776b3a99483912f27da6e95c480c0"
-    CHECKSUM_arm64="5372597c7165cb09657c7b9cfb5da1e58673940cf0ebbd4ecf8040e9ab9eb9e7"
+    YTT_VERSION=0.51.1
+    CHECKSUM_amd64="026a12ee7108ff2d1150eb1347d544367d92e993ade7b2d2727c4c8d13a47a6b"
+    CHECKSUM_arm64="55849cab41cf7780b0d26da416395cf77576a434a4bcf883b0e2a29944325e7c"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /opt/kubernetes/bin/ytt https://github.com/carvel-dev/ytt/releases/download/v${VERSION}/ytt-linux-${TARGETARCH}
+    set -eo pipefail
+    curl --silent --fail -L -o /opt/kubernetes/bin/ytt https://github.com/carvel-dev/ytt/releases/download/v${YTT_VERSION}/ytt-linux-${TARGETARCH}
     echo "${!CHECKSUM} /opt/kubernetes/bin/ytt" | sha256sum --check --status
     chmod +x /opt/kubernetes/bin/ytt
 EOF
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=0.39.0
-    CHECKSUM_amd64="98b80baa5d665c5119fc8e2a62978f9d193c9647e3c47ab72867b055b94d14ff"
-    CHECKSUM_arm64="7b247c24850dbf4ff70095b6d7f5aff12aea15d0ece9e9ecf66f92e3c9d2f332"
+    IMGPKG_VERSION=0.44.0
+    CHECKSUM_amd64="15ca4f8ec4c7a1c6ecf06740a942149887a73845565f0ffbf6ccbf013b65a58a"
+    CHECKSUM_arm64="f772b6eb10654f45d15d2166d5be81cf18529aece59df906c25dcb364f508ebe"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /opt/kubernetes/bin/imgpkg https://github.com/carvel-dev/imgpkg/releases/download/v${VERSION}/imgpkg-linux-${TARGETARCH}
+    set -eo pipefail
+    curl --silent --fail -L -o /opt/kubernetes/bin/imgpkg https://github.com/carvel-dev/imgpkg/releases/download/v${IMGPKG_VERSION}/imgpkg-linux-${TARGETARCH}
     echo "${!CHECKSUM} /opt/kubernetes/bin/imgpkg" | sha256sum --check --status
     chmod +x /opt/kubernetes/bin/imgpkg
 EOF
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=0.38.2
-    CHECKSUM_amd64="bd471a1270481f04a3ad656b5911167cd4173ff7c1cc524ddc27569b02978a74"
-    CHECKSUM_arm64="36bb1e689247aca092c9cff7b349adb505760c257ccf1fcdf25a54086182c37c"
+    KBLD_VERSION=0.45.0
+    CHECKSUM_amd64="e076af83ef05765e6bf825f2bf5ac31c365cc0d513b7317bd634f3b9c6b5ee5d"
+    CHECKSUM_arm64="9e52c553322fa21a8af10d47d76c66eb7a2f406fad92bb589458554cb4143121"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /opt/kubernetes/bin/kbld https://github.com/carvel-dev/kbld/releases/download/v${VERSION}/kbld-linux-${TARGETARCH}
+    set -eo pipefail
+    curl --silent --fail -L -o /opt/kubernetes/bin/kbld https://github.com/carvel-dev/kbld/releases/download/v${KBLD_VERSION}/kbld-linux-${TARGETARCH}
     echo "${!CHECKSUM} /opt/kubernetes/bin/kbld" | sha256sum --check --status
     chmod +x /opt/kubernetes/bin/kbld
 EOF
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=0.59.2
-    CHECKSUM_amd64="6986369c06e89bcec366b2cc18f81634fcd95e2b52c6c6f7ee46b497ade25f7d"
-    CHECKSUM_arm64="03d8ef43aa467756a22fea6d32745b3bddef163fa22de4f8b5edd1d60fdc0585"
+    KAPP_VERSION=0.64.0
+    CHECKSUM_amd64="14207d33130e833d201f2cd6e3e87435fb8b9534298843ed3c00fe7cda5221df"
+    CHECKSUM_arm64="fc7617107fa87480e6326c1cdf2c62708f455c9d96f8e9550fb5e848c296cc80"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /opt/kubernetes/bin/kapp https://github.com/carvel-dev/kapp/releases/download/v${VERSION}/kapp-linux-${TARGETARCH}
+    set -eo pipefail
+    curl --silent --fail -L -o /opt/kubernetes/bin/kapp https://github.com/carvel-dev/kapp/releases/download/v${KAPP_VERSION}/kapp-linux-${TARGETARCH}
     echo "${!CHECKSUM} /opt/kubernetes/bin/kapp" | sha256sum --check --status
     chmod +x /opt/kubernetes/bin/kapp
 EOF
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=0.0.8
+    KWT_VERSION=0.0.8
     CHECKSUM_amd64="1022483a8b59fe238e782a9138f1fee6ca61ecf7ccd1e5f0d98e95c56df94d87"
     CHECKSUM_arm64="7b94a134cbde5ff2e245d102f54b9ac9f81b3fcc5e54a5cefecc1e5845b8a65f"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /opt/kubernetes/bin/kwt https://github.com/carvel-dev/kwt/releases/download/v${VERSION}/kwt-linux-${TARGETARCH}
+    set -eo pipefail
+    curl --silent --fail -L -o /opt/kubernetes/bin/kwt https://github.com/carvel-dev/kwt/releases/download/v${KWT_VERSION}/kwt-linux-${TARGETARCH}
     echo "${!CHECKSUM} /opt/kubernetes/bin/kwt" | sha256sum --check --status
     chmod +x /opt/kubernetes/bin/kwt
 EOF
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=0.38.0
-    CHECKSUM_amd64="49076dd93ae931ac0d341d81e51b6fdb2288c718cfda8279b78e31c6d389da5f"
-    CHECKSUM_arm64="88e3588632f58f44f31d3fa19f60d4aad8ea0075b6fc68956a9d061d8de2442d"
+    VENDIR_VERSION=0.43.0
+    CHECKSUM_amd64="3d31f00efc0a11a8dfcf662d45a120d18f99105d1502bbfe12a6cbd9d0b1f570"
+    CHECKSUM_arm64="0895efdc3fe36f37035ce96169e8cc335a103adcfe02092fcc29f514be8867e7"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /opt/kubernetes/bin/vendir https://github.com/carvel-dev/vendir/releases/download/v${VERSION}/vendir-linux-${TARGETARCH}
+    set -eo pipefail
+    curl --silent --fail -L -o /opt/kubernetes/bin/vendir https://github.com/carvel-dev/vendir/releases/download/v${VENDIR_VERSION}/vendir-linux-${TARGETARCH}
     echo "${!CHECKSUM} /opt/kubernetes/bin/vendir" | sha256sum --check --status
     chmod +x /opt/kubernetes/bin/vendir
 EOF
 
 RUN <<EOF
-    set -eo pipefail
-    VERSION=0.49.0
-    CHECKSUM_amd64="ed47847850039cf5572af49420d0365b2cc68a3a731fbc5e8a23b13eb8ffb020"
-    CHECKSUM_arm64="f513b6b58a75b45506c3a347f63118bd4abffab9c69975c32089c7756d5807a4"
+    KCTRL_VERSION=0.55.1
+    CHECKSUM_amd64="39dd9593f3a7435ea2a9014dd832b5c9ed1eb1aba52e22c2b6186a0170c52f34"
+    CHECKSUM_arm64="234bcab23f6d8349855bf1dfd27dd0d1617ff2188034be8c37e984026893d9e1"
     CHECKSUM=CHECKSUM_${TARGETARCH}
-    curl --silent --fail -L -o /opt/kubernetes/bin/kctrl https://github.com/carvel-dev/kapp-controller/releases/download/v${VERSION}/kctrl-linux-${TARGETARCH}
+    set -eo pipefail
+    curl --silent --fail -L -o /opt/kubernetes/bin/kctrl https://github.com/carvel-dev/kapp-controller/releases/download/v${KCTRL_VERSION}/kctrl-linux-${TARGETARCH}
     echo "${!CHECKSUM} /opt/kubernetes/bin/kctrl" | sha256sum --check --status
     chmod +x /opt/kubernetes/bin/kctrl
 EOF
