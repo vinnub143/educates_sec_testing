@@ -389,9 +389,9 @@ RUN mkdir -p /opt/slides/reveal.js/3.9.2 && \
     curl -sL -o src.tar.gz https://github.com/hakimel/reveal.js/archive/4.6.0.tar.gz && \
     tar --strip-components 1 -xf src.tar.gz && \
     rm src.tar.gz && \
-    mkdir -p /opt/slides/reveal.js/5.0.3 && \
-    cd /opt/slides/reveal.js/5.0.3 && \
-    curl -sL -o src.tar.gz https://github.com/hakimel/reveal.js/archive/5.0.3.tar.gz && \
+    mkdir -p /opt/slides/reveal.js/5.1.0 && \
+    cd /opt/slides/reveal.js/5.1.0 && \
+    curl -sL -o src.tar.gz https://github.com/hakimel/reveal.js/archive/5.1.0.tar.gz && \
     tar --strip-components 1 -xf src.tar.gz && \
     rm src.tar.gz && \
     mkdir -p /opt/slides/impress.js/1.1.0 && \

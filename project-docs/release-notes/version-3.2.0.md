@@ -35,8 +35,9 @@ Features Changed
 * Updated `kind` version bundled with `educates` CLI. Default Kubernetes cluster
   version now created by `educates create-cluster` command will be 1.32.
 
-* Updated versions of numerous bundled applications, including Docker, Helm,
-  Hugo, Carvel tools, `dive`, `yq`, `k9s`, `skaffold`, `kustomize`.
+* Updated versions of numerous bundled applications, including Contour, Docker,
+  Docker Registry, Helm, Hugo, Carvel tools, `dive`, `yq`, `k9s`, `skaffold`,
+  `kustomize`, `reveal.js`.
 
 * Update bundled VS Code Server to version 1.97.2.
 
