@@ -1,4 +1,4 @@
-FROM golang:1.19-buster as builder-image
+FROM golang:1.19-buster AS builder-image
 
 WORKDIR /app
 
