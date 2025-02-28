@@ -56,3 +56,8 @@ Bugs Fixed
   sent in lower case. This is allowed by HTTP specification as meant to be case
   insensitive, but some web services were only accepting mixed case, so use the
   mixed case convention so better chance of working with broken web services.
+
+* Password for `git` application server was not unique per workshop session but
+  was the same for all workshop sessions within the workshop environment. The
+  `git` credentials therefore only differed based on `git` username, which was
+  predictable as was based on workshop session name.
