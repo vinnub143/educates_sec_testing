@@ -39,19 +39,26 @@ RUN curl --fail -sL -o /tmp/maven.tar.gz https://archive.apache.org/dist/maven/m
 ENV PATH=/opt/java/bin:/opt/gradle/bin:/opt/maven/bin:$PATH \
     JAVA_HOME=/opt/java \
     M2_HOME=/opt/maven \
-    GRADLE_HOME=/opt/gradle \
-    MAVEN_OPTS="-XX:UseSVE=0" \
-    JAVA_OPTS="-XX:UseSVE=0"
+    GRADLE_HOME=/opt/gradle
 
-COPY gradle.properties .
+COPY gradle.properties-arm64 .
 
-RUN mvn archetype:generate -DgroupId=com.mycompany.app -DartifactId=my-app \
+RUN if [ "${TARGETARCH}" = "arm64" ]; then \
+        export MAVEN_OPTS="-XX:UseSVE=0"; \
+        export JAVA_OPTS="-XX:UseSVE=0"; \
+    fi && \
+    mvn archetype:generate -DgroupId=com.mycompany.app -DartifactId=my-app \
         -DarchetypeArtifactId=maven-archetype-quickstart \
         -DarchetypeVersion=1.4 -DinteractiveMode=false && \
     cd my-app && \
     mvn wrapper:wrapper
 
-RUN gradle init && \
+RUN if [ "${TARGETARCH}" = "arm64" ]; then \
+        export MAVEN_OPTS="-XX:UseSVE=0"; \
+        export JAVA_OPTS="-XX:UseSVE=0"; \
+        mv gradle.properties-arm64 gradle.properties; \
+    fi && \
+    gradle init && \
     gradle wrapper --gradle-version=8.8 --distribution-type=bin && \
     ./gradlew build
 
