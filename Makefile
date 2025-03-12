@@ -17,7 +17,7 @@ endif
 TARGET_PLATFORM = $(TARGET_SYSTEM)-$(TARGET_MACHINE)
 DOCKER_PLATFORM = linux/$(TARGET_MACHINE)
 
-all: push-all-images # deploy-installer deploy-workshop
+all: push-all-images build-client-programs # deploy-installer deploy-workshop
 
 build-all-images: build-session-manager build-training-portal \
   build-base-environment build-jdk8-environment build-jdk11-environment \
@@ -31,17 +31,18 @@ push-all-images: push-session-manager push-training-portal \
   push-jdk17-environment push-jdk21-environment \
   push-conda-environment push-docker-registry \
   push-pause-container push-secrets-manager push-tunnel-manager \
-  push-image-cache push-assets-server push-lookup-service
+  push-image-cache push-assets-server push-lookup-service \
+  push-installer-bundle
 
 build-core-images: build-session-manager build-training-portal \
   build-base-environment build-docker-registry build-pause-container \
   build-secrets-manager build-tunnel-manager build-image-cache \
-  build-assets-server
+  build-assets-server build-lookup-service
 
 push-core-images: push-session-manager push-training-portal \
   push-base-environment push-docker-registry push-pause-container \
   push-secrets-manager push-tunnel-manager push-image-cache \
-  push-assets-server
+  push-assets-server push-lookup-service
 
 build-session-manager:
 	docker build --progress plain --platform $(DOCKER_PLATFORM) -t $(IMAGE_REPOSITORY)/educates-session-manager:$(PACKAGE_VERSION) session-manager

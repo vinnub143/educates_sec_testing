@@ -2449,6 +2449,7 @@ def workshop_session_create(name, body, meta, uid, spec, status, patch, retry, *
                     "capabilities": {"drop": ["ALL"]},
                     "runAsNonRoot": True,
                     "runAsUser": 1001,
+                    "runAsGroup": 2375,
                     # "seccompProfile": {"type": "RuntimeDefault"},
                 },
                 "resources": {

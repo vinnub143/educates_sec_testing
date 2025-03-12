@@ -1099,7 +1099,7 @@ def workshop_environment_create(
         training_portal=portal_name,
     )
 
-    application_variables_list = workshop_spec.get("session").get("variables", [])
+    application_variables_list = workshop_spec.get("environment", {}).get("variables", [])
 
     application_variables_list = substitute_variables(
         application_variables_list, environment_variables
