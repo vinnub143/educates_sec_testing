@@ -89,13 +89,6 @@ echo "09cd14a34f17d88cd4f0d2b73e0bbd0bf56984be21bc947f416a7824a709011e /tmp/git-
     go mod download && \
     go build -o git-serve cmd/git-serve/main.go
 
-RUN curl --silent --fail -L -o /tmp/dive.tar.gz https://github.com/wagoodman/dive/archive/refs/tags/v0.12.0.tar.gz && \
-    echo "2b69b8d28220c66e2575a782a370a0c05077936ae3ce69180525412fcca09230 /tmp/dive.tar.gz" | sha256sum --check --status && \
-    tar xvf /tmp/dive.tar.gz && \
-    cd dive-0.12.0 && \
-    go mod download && \
-    go build -o main main.go
-
 FROM system-base AS scratch-image
 
 ARG TARGETARCH
@@ -141,7 +134,17 @@ RUN <<EOF
     rm /tmp/hugo.tar.gz
 EOF
 
-COPY --from=builder-image /app/dive-0.12.0/main /usr/local/bin/dive
+RUN <<EOF
+    DIVE_VERSION=0.12.0
+    CHECKSUM_amd64="20a7966523a0905f950c4fbf26471734420d6788cfffcd4a8c4bc972fded3e96"
+    CHECKSUM_arm64="a2a1470302cdfa367a48f80b67bbf11c0cd8039af9211e39515bd2bbbda58fea"
+    CHECKSUM=CHECKSUM_${TARGETARCH}
+    set -eo pipefail
+    curl --silent --fail -L -o /tmp/dive.tar.gz https://github.com/wagoodman/dive/releases/download/v${DIVE_VERSION}/dive_${DIVE_VERSION}_linux_${TARGETARCH}.tar.gz
+    echo "${!CHECKSUM} /tmp/dive.tar.gz" | sha256sum --check --status
+    tar -C /usr/local/bin -zxvf /tmp/dive.tar.gz dive
+    rm /tmp/dive.tar.gz
+EOF
 
 # Kubernetes tools.
 
