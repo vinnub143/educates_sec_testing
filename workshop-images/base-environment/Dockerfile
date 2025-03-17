@@ -146,6 +146,20 @@ RUN <<EOF
     rm /tmp/dive.tar.gz
 EOF
 
+RUN <<EOF
+    UV_VERSION=0.6.6
+    ARCHNAME_amd64=x86_64
+    ARCHNAME_arm64=aarch64
+    ARCHNAME=ARCHNAME_${TARGETARCH}
+    CHECKSUM_amd64="16667b429a57ee917b10093e81e52956e4c19f9fd73d05dd87c3cbc27779ac7e"
+    CHECKSUM_arm64="37a543598cdb7d8fc9b74e6b1fe1fdf8b9a279c6137c7ff8396a88f69ec7a43c"
+    CHECKSUM=CHECKSUM_${TARGETARCH}
+    set -eo pipefail
+    curl --silent --fail -L -o /tmp/uv.tar.gz https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-${!ARCHNAME}-unknown-linux-gnu.tar.gz
+    tar -C /usr/local/bin --strip-components 1 -xf /tmp/uv.tar.gz uv-${!ARCHNAME}-unknown-linux-gnu/uv uv-${!ARCHNAME}-unknown-linux-gnu/uvx
+    rm -f /tmp/uv.tar.gz
+EOF
+
 # Kubernetes tools.
 
 RUN mkdir -p /opt/kubernetes/bin
