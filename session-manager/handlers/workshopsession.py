@@ -3139,9 +3139,7 @@ def workshop_session_create(name, body, meta, uid, spec, status, patch, retry, *
         ]
 
     if INGRESS_CLASS:
-        ingress_body["metadata"]["annotations"][
-            "kubernetes.io/ingress.class"
-        ] = INGRESS_CLASS
+        ingress_body["spec"]["ingressClassName"] = INGRESS_CLASS
 
     # Update deployment with host aliases for the ports which ingresses are
     # targeting. This is so thay can be accessed by hostname rather than by
