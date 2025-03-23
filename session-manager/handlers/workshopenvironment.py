@@ -2233,11 +2233,16 @@ def workshop_environment_create(
 
         kopf.adopt(object_body, namespace_instance.obj)
 
-        try:
-            object_name = object_body["metadata"]["name"]
-            object_namespace = object_body["metadata"]["namespace"]
-            object_type = object_body["kind"]
+        object_name = object_body["metadata"]["name"]
+        object_namespace = object_body["metadata"]["namespace"]
+        object_type = object_body["kind"]
+        object_api_version = object_body["apiVersion"]
 
+        if object_api_version == "v1" and object_type.lower() == "namespace":
+            annotations = object_body["metadata"].setdefault("annotations", {})
+            annotations["secretgen.carvel.dev/excluded-from-wildcard-matching"] = ""
+
+        try:
             logger.info(
                 "Creating workshop environment object %s of type %s in namespace %s for workshop environment %s.",
                 object_name,
