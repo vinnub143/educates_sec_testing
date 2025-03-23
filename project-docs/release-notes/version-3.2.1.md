@@ -21,3 +21,12 @@ Bugs Fixed
 * Fixed generation of resolved images via kbld, so that descriptors and 
   configuration now has the sha256 resolved version of the images. This fixes
   the ability to create disconnected installs.
+
+* Secrets were not being blocked from being injected by the Carvel
+  `secretgen-controller` operator into namespaces created from
+  `environment.objects`, `session.objects` and `request.objects` via the
+  operators wildcard injection mechanism. These were being blocked for the
+  session namespace and namespaces listed as secondary namespaces for sessions,
+  but not namespaces manually included in `objects`. These are blocked due to
+  the extreme risk from wildcard injection into any namespace since workshop
+  session users can be untrusted users.
