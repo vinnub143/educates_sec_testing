@@ -1306,7 +1306,9 @@ def workshop_session_create(name, body, meta, uid, spec, status, patch, retry, *
         kopf.adopt(object_body, namespace_instance.obj)
 
         if object_api_version == "v1" and object_type.lower() == "namespace":
-            annotations = object_body["metadata"].get("annotations", {})
+            annotations = object_body["metadata"].setdefault("annotations", {})
+
+            annotations["secretgen.carvel.dev/excluded-from-wildcard-matching"] = ""
 
             target_role = annotations.get(
                 f"training.{OPERATOR_API_GROUP}/session.role", role
