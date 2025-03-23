@@ -30,3 +30,7 @@ Bugs Fixed
   but not namespaces manually included in `objects`. These are blocked due to
   the extreme risk from wildcard injection into any namespace since workshop
   session users can be untrusted users.
+
+* If using local config with `educates` CLI and you wanted to set the value
+  `clusterNetwork.blockCIDRs`, it would be ignored as the CLI was wrongly
+  looking for `blockCIDRS` for setting name.
