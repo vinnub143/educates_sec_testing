@@ -15,6 +15,10 @@ Features Changed
   version that can be used has also been bumped to 4.34 released by end of 
   August 2024.
 
+* When using the REST API to request workshop sessions, it is now no longer
+  possible to request workshop requests for users who are marked as staff, or
+  which are in the robots group.
+
 Bugs Fixed
 ----------
 
