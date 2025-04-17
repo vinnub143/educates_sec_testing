@@ -214,6 +214,15 @@ func generateDnsmasqConfig(domain string, targetAddress string, extraDomains []s
 		ExtraDomains  []string
 	}
 
+	// We remove from extraDomains any domains that are already included in the
+	// IngressDomain.
+
+	for i, extraDomain := range extraDomains {
+		if domain == extraDomain {
+			extraDomains = append(extraDomains[:i], extraDomains[i+1:]...)
+		}
+	}
+
 	config := TemplateConfig{
 		IngressDomain: domain,
 		TargetAddress: targetAddress,
