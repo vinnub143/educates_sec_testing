@@ -626,6 +626,9 @@ class Session(models.Model):
     url = models.URLField(verbose_name="session url", null=True)
     params = JSONField(verbose_name="session params", default={})
     password = models.CharField(verbose_name="config password", max_length=256, null=True, blank=True)
+    analytics_url = models.URLField(
+        verbose_name="analytics url", null=True, blank=True
+    )
 
     def environment_name(self):
         return self.environment.name

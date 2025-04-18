@@ -313,6 +313,7 @@ class TrainingPortalClientSession:
         user_id: str,
         parameters: List[Dict[str, str]],
         index_url: str,
+        analytics_url: str,
     ) -> Dict[str, str] | None:
         """Request a workshop session for a user."""
 
@@ -328,6 +329,7 @@ class TrainingPortalClientSession:
                 params={
                     "user": user_id,
                     "index_url": index_url,
+                    "analytics_url": analytics_url,
                 },
                 json={"parameters": parameters},
             ) as response:
