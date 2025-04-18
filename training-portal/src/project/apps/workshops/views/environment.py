@@ -325,6 +325,8 @@ def environment_request(request, name):
     if last_name:
         user_details["last_name"] = last_name
 
+    analytics_url = request.GET.get("analytics_url", "").strip()
+
     session_name = request.GET.get("session")
 
     # The timeout here in seconds is how long the workshop session will be
@@ -409,7 +411,7 @@ def environment_request(request, name):
     token = "".join(random.sample(characters, 32))
 
     session = retrieve_session_for_user(
-        instance, user, session_name, token, timeout, params
+        instance, user, session_name, token, timeout, params, analytics_url
     )
 
     if not session:

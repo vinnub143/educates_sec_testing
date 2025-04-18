@@ -1,6 +1,4 @@
-"""Defines basic functions for managing creation of workshop sessions.
-
-"""
+"""Defines basic functions for managing creation of workshop sessions."""
 
 import string
 import random
@@ -94,7 +92,7 @@ def create_request_resources(session):
         ("username", session.owner.username),
         ("first_name", session.owner.first_name),
         ("last_name", session.owner.last_name),
-        ("email", session.owner.email)
+        ("email", session.owner.email),
     ):
         secret_body["data"][key] = base64.b64encode(value.encode("UTF-8")).decode(
             "UTF-8"
@@ -716,7 +714,9 @@ def initiate_reserved_sessions(portal):
     transaction.on_commit(_schedule_session_creation)
 
 
-def allocate_session_for_user(environment, user, token, timeout=None, params={}):
+def allocate_session_for_user(
+    environment, user, token, timeout=None, params={}, analytics_url=None
+):
     """Allocate a workshop session to the user for the specified workshop
     environment from any reserved workshop sessions. Replace now allocated
     workshop session with a new reserved session if required.
@@ -735,6 +735,7 @@ def allocate_session_for_user(environment, user, token, timeout=None, params={})
     # immediately due to not being accessed.
 
     session.params = resolve_request_params(session.environment.workshop, params)
+    session.analytics_url = analytics_url
 
     if token:
         update_session_status(session.name, "Allocating", user)
@@ -758,7 +759,9 @@ def allocate_session_for_user(environment, user, token, timeout=None, params={})
     return session
 
 
-def create_session_for_user(environment, user, token, timeout=None, params={}):
+def create_session_for_user(
+    environment, user, token, timeout=None, params={}, analytics_url=None
+):
     """Create a new workshop session in case there was no existing reserved
     workshop sessions for the specified workshop environment.
 
@@ -782,6 +785,7 @@ def create_session_for_user(environment, user, token, timeout=None, params={}):
         session = create_new_session(environment)
 
         session.params = resolve_request_params(session.environment.workshop, params)
+        session.analytics_url = analytics_url
 
         if token:
             update_session_status(session.name, "Allocating", user)
@@ -811,6 +815,7 @@ def create_session_for_user(environment, user, token, timeout=None, params={}):
         session = create_new_session(environment)
 
         session.params = resolve_request_params(session.environment.workshop, params)
+        session.analytics_url = analytics_url
 
         if token:
             update_session_status(session.name, "Allocating", user)
@@ -847,6 +852,7 @@ def create_session_for_user(environment, user, token, timeout=None, params={}):
     session = create_new_session(environment)
 
     session.params = resolve_request_params(session.environment.workshop, params)
+    session.analytics_url = analytics_url
 
     if token:
         update_session_status(session.name, "Allocating", user)
@@ -864,7 +870,13 @@ def create_session_for_user(environment, user, token, timeout=None, params={}):
 
 
 def retrieve_session_for_user(
-    environment, user, session_name=None, token=None, timeout=None, params={}
+    environment,
+    user,
+    session_name=None,
+    token=None,
+    timeout=None,
+    params={},
+    analytics_url=None,
 ):
     """Determine if there is already an allocated session for this workshop
     environment which the user is an owner of. If there is return it. Note
@@ -913,7 +925,9 @@ def retrieve_session_for_user(
     # Attempt to allocate a session to the user for the workshop environment
     # from any set of reserved sessions.
 
-    session = allocate_session_for_user(environment, user, token, timeout, params)
+    session = allocate_session_for_user(
+        environment, user, token, timeout, params, analytics_url
+    )
 
     if session:
         return session
@@ -922,4 +936,6 @@ def retrieve_session_for_user(
     # of a new session if there is available capacity. If there is no
     # available capacity, no session will be returned.
 
-    return create_session_for_user(environment, user, token, timeout, params)
+    return create_session_for_user(
+        environment, user, token, timeout, params, analytics_url
+    )
