@@ -4,7 +4,7 @@ import logging
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Dict, List, Tuple, Union
 
-from aiohttp import BasicAuth, ClientSession, ClientConnectorError
+from aiohttp import BasicAuth, ClientSession, ClientConnectorError, ClientError
 
 from .clusters import ClusterConfig
 
@@ -367,4 +367,21 @@ class TrainingPortalClientSession:
                 self.portal.cluster.name,
                 user_id,
                 exc,
+            )
+
+        except ClientError as exc:
+            logger.error(
+                "Failed to request workshop session from portal %s of cluster %s for user %s: %s",
+                self.portal.name,
+                self.portal.cluster.name,
+                user_id,
+                exc,
+            )
+
+        except Exception as exc:
+            logger.exception(
+                "Unexpected exception when requesting workshop session from portal %s of cluster %s for user %s",
+                self.portal.name,
+                self.portal.cluster.name,
+                user_id
             )
