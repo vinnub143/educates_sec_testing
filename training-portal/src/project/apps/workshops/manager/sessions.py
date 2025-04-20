@@ -3,7 +3,6 @@
 import string
 import random
 import logging
-import traceback
 import base64
 
 from itertools import islice
@@ -715,7 +714,13 @@ def initiate_reserved_sessions(portal):
 
 
 def allocate_session_for_user(
-    environment, user, token, timeout=None, params={}, analytics_url=None
+    environment,
+    user,
+    token,
+    timeout=None,
+    params={},
+    index_url=None,
+    analytics_url=None,
 ):
     """Allocate a workshop session to the user for the specified workshop
     environment from any reserved workshop sessions. Replace now allocated
@@ -735,6 +740,8 @@ def allocate_session_for_user(
     # immediately due to not being accessed.
 
     session.params = resolve_request_params(session.environment.workshop, params)
+
+    session.index_url = index_url
     session.analytics_url = analytics_url
 
     if token:
@@ -760,7 +767,13 @@ def allocate_session_for_user(
 
 
 def create_session_for_user(
-    environment, user, token, timeout=None, params={}, analytics_url=None
+    environment,
+    user,
+    token,
+    timeout=None,
+    params={},
+    index_url=None,
+    analytics_url=None,
 ):
     """Create a new workshop session in case there was no existing reserved
     workshop sessions for the specified workshop environment.
@@ -785,6 +798,8 @@ def create_session_for_user(
         session = create_new_session(environment)
 
         session.params = resolve_request_params(session.environment.workshop, params)
+
+        session.index_url = index_url
         session.analytics_url = analytics_url
 
         if token:
@@ -815,6 +830,8 @@ def create_session_for_user(
         session = create_new_session(environment)
 
         session.params = resolve_request_params(session.environment.workshop, params)
+
+        session.index_url = index_url
         session.analytics_url = analytics_url
 
         if token:
@@ -852,6 +869,8 @@ def create_session_for_user(
     session = create_new_session(environment)
 
     session.params = resolve_request_params(session.environment.workshop, params)
+
+    session.index_url = index_url
     session.analytics_url = analytics_url
 
     if token:
@@ -876,6 +895,7 @@ def retrieve_session_for_user(
     token=None,
     timeout=None,
     params={},
+    index_url=None,
     analytics_url=None,
 ):
     """Determine if there is already an allocated session for this workshop
@@ -926,7 +946,7 @@ def retrieve_session_for_user(
     # from any set of reserved sessions.
 
     session = allocate_session_for_user(
-        environment, user, token, timeout, params, analytics_url
+        environment, user, token, timeout, params, index_url, analytics_url
     )
 
     if session:
@@ -937,5 +957,5 @@ def retrieve_session_for_user(
     # available capacity, no session will be returned.
 
     return create_session_for_user(
-        environment, user, token, timeout, params, analytics_url
+        environment, user, token, timeout, params, index_url, analytics_url
     )
