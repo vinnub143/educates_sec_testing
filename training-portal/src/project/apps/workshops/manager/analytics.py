@@ -87,9 +87,6 @@ def report_analytics_event(entity, event, data={}):
     if message:
         logger.debug("Reporting analytics event %s as message %s.", event, message)
 
-    # if not settings.ANALYTICS_WEBHOOK_URL:
-    #     return
-
     if message:
         if settings.ANALYTICS_WEBHOOK_URL:
             send_event_to_webhook(settings.ANALYTICS_WEBHOOK_URL, message).schedule()

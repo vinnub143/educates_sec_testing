@@ -172,6 +172,7 @@ class SessionAdmin(admin.ModelAdmin):
         "expires",
         "url_link",
         "params",
+        "index_url",
         "analytics_url",
     ]
 
