@@ -99,6 +99,10 @@ async def api_post_v1_workshops(request: web.Request) -> web.Response:
     action_id = data.get("clientActionId") or ""  # pylint: disable=unused-variable
     index_url = data.get("clientIndexUrl") or ""
 
+    user_email = data.get("userEmailAddress") or ""
+    user_first_name = data.get("userFirstName") or ""
+    user_last_name = data.get("userLastName") or ""
+
     workshop_name = data.get("workshopName")
     parameters = data.get("workshopParams", [])
 
@@ -111,7 +115,7 @@ async def api_post_v1_workshops(request: web.Request) -> web.Response:
         workshop_name,
         user_id,
         action_id,
-        analytics_url
+        analytics_url,
     )
 
     if not tenant_name:
@@ -218,7 +222,13 @@ async def api_post_v1_workshops(request: web.Request) -> web.Response:
 
     for environment in environments:
         data = await environment.request_workshop_session(
-            user_id, parameters, index_url, analytics_url
+            user_id,
+            user_email,
+            user_first_name,
+            user_last_name,
+            parameters,
+            index_url,
+            analytics_url,
         )
 
         if data:
