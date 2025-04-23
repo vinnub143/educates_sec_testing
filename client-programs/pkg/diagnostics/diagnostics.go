@@ -5,6 +5,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/educates/educates-training-platform/client-programs/pkg/cluster"
 )
@@ -152,7 +153,7 @@ func getDestDirAndFile(dest string) (string, string, error) {
 	if dest == "" {
 		return "", "", fmt.Errorf("dest is required")
 	}
-	if filepath.Ext(dest) == ".tar.gz" {
+	if strings.HasSuffix(dest, ".tar.gz") {
 		return filepath.Dir(dest), filepath.Base(dest), nil
 	} else if filepath.Ext(dest) == "" {
 		return dest, "", nil
