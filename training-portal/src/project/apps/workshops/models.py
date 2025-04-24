@@ -351,6 +351,31 @@ class TrainingPortal(models.Model):
             state=SessionState.STOPPED
         )
 
+    def stopped_session(self, name, user=None):
+        """Returns any stopped workshop session with the specified name.
+        Optionally validates whether allocated to the specified user and
+        only returns the workshop session if it is.
+
+        """
+
+        try:
+            session = Session.objects.get(
+                name=name,
+                environment__portal=self,
+                state__in=(
+                    SessionState.STOPPED,
+                ),
+            )
+            if user:
+                if session.owner == user:
+                    return session
+
+            else:
+                return session
+
+        except Session.DoesNotExist:
+            pass
+
     def session_permitted_for_user(self, user):
         """Returns where the specified user is permitted to create a workshop
         session. If the user is staff, they are always permitted. For non
