@@ -15,9 +15,9 @@ import (
 	"time"
 
 	yttcmd "carvel.dev/ytt/pkg/cmd/template"
+	"github.com/educates/educates-training-platform/client-programs/pkg/cluster"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"github.com/educates/educates-training-platform/client-programs/pkg/cluster"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -28,6 +28,7 @@ import (
 type ClusterWorkshopDeployOptions struct {
 	KubeconfigOptions
 	Name            string
+	Alias           string
 	Path            string
 	Portal          string
 	Capacity        uint
@@ -101,7 +102,7 @@ func (o *ClusterWorkshopDeployOptions) Run() error {
 
 	// Update the training portal, creating it if necessary.
 
-	err = deployWorkshopResource(dynamicClient, workshop, o.Portal, o.Capacity, o.Reserved, o.Initial, o.Expires, o.Overtime, o.Deadline, o.Orphaned, o.Overdue, o.Refresh, o.Repository, o.Environ, o.Labels, o.OpenBrowser)
+	err = deployWorkshopResource(dynamicClient, workshop, o.Alias, o.Portal, o.Capacity, o.Reserved, o.Initial, o.Expires, o.Overtime, o.Deadline, o.Orphaned, o.Overdue, o.Refresh, o.Repository, o.Environ, o.Labels, o.OpenBrowser)
 
 	if err != nil {
 		return err
@@ -126,6 +127,13 @@ func (p *ProjectInfo) NewClusterWorkshopDeployCmd() *cobra.Command {
 		"n",
 		"",
 		"name to be used for the workshop definition, generated if not set",
+	)
+	c.Flags().StringVarP(
+		&o.Alias,
+		"alias",
+		"a",
+		"",
+		"alias to be used to identify the workshop by the training portal",
 	)
 	c.Flags().StringVarP(
 		&o.Path,
@@ -293,7 +301,7 @@ func (p *ProjectInfo) NewClusterWorkshopDeployCmd() *cobra.Command {
 
 var trainingPortalResource = schema.GroupVersionResource{Group: "training.educates.dev", Version: "v1beta1", Resource: "trainingportals"}
 
-func deployWorkshopResource(client dynamic.Interface, workshop *unstructured.Unstructured, portal string, capacity uint, reserved uint, initial uint, expires string, overtime string, deadline string, orphaned string, overdue string, refresh string, registry string, environ []string, labels []string, openBrowser bool) error {
+func deployWorkshopResource(client dynamic.Interface, workshop *unstructured.Unstructured, alias string, portal string, capacity uint, reserved uint, initial uint, expires string, overtime string, deadline string, orphaned string, overdue string, refresh string, registry string, environ []string, labels []string, openBrowser bool) error {
 	trainingPortalClient := client.Resource(trainingPortalResource)
 
 	trainingPortal, err := trainingPortalClient.Get(context.TODO(), portal, metav1.GetOptions{})
@@ -397,7 +405,7 @@ func deployWorkshopResource(client dynamic.Interface, workshop *unstructured.Uns
 
 		updatedWorkshops = append(updatedWorkshops, object)
 
-		if object["name"] == workshop.GetName() {
+		if object["name"] == workshop.GetName() && object["alias"] == alias {
 			foundWorkshop = true
 
 			object["reserved"] = int64(reserved)
@@ -476,6 +484,7 @@ func deployWorkshopResource(client dynamic.Interface, workshop *unstructured.Uns
 
 	type WorkshopDetails struct {
 		Name     string           `json:"name"`
+		Alias    string           `json:"alias"`
 		Capacity int64            `json:"capacity,omitempty"`
 		Initial  int64            `json:"initial"`
 		Reserved int64            `json:"reserved"`
@@ -493,6 +502,7 @@ func deployWorkshopResource(client dynamic.Interface, workshop *unstructured.Uns
 	if !foundWorkshop {
 		workshopDetails := WorkshopDetails{
 			Name:     workshop.GetName(),
+			Alias:    alias,
 			Initial:  int64(initial),
 			Reserved: int64(reserved),
 			Expires:  expires,

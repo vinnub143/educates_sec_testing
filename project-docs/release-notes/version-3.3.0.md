@@ -17,6 +17,16 @@ New Features
   will be recorded against a user in the training portal database if a user
   needs to be created.
 
+* Added `alias` property to `workshops` details in a `TrainingPortal`. This will
+  override the `name` property which identifies the name of the `Workshop`
+  definition, as the key used to lookup the workshop by name via the REST API.
+  Using this new property, it is possible to have multiple workshops listed with
+  the same `name` for the `Workshop` definition, but different values for
+  `alias`. This might be used for example where you want to use the same
+  workshop definition, but customise it for two different workshop environments,
+  by supplying different `env` values for the workshop in the `TrainingPortal`
+  definition.
+
 Bugs Fixed
 ----------
 

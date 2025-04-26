@@ -172,6 +172,24 @@ class TrainingPortal(models.Model):
         except Environment.DoesNotExist:
             pass
 
+    def environments_for_resource(self, name):
+        """Returns any current active workshop environments for the named
+        resource. These can be a running workshop environment or one which
+        is in the process of being setup. If trying to determine if a new
+        workshop session can be created against it, you need to separately
+        check whether it is in the running state. Will return empty list if
+        there are no matching environments.
+
+        """
+
+        return self.environment_set.filter(
+            resource_name=name,
+            state__in=(
+                EnvironmentState.STARTING,
+                EnvironmentState.RUNNING,
+            ),
+        )
+
     def workshop_environment(self, name):
         """Returns the named workshop environment. This can be a running
         workshop environment or one which is in the process of being setup.
@@ -435,6 +453,7 @@ class EnvironmentState(enum.IntEnum):
 class Environment(models.Model):
     portal = models.ForeignKey(TrainingPortal, on_delete=models.PROTECT)
     workshop_name = models.CharField(verbose_name="workshop name", max_length=256)
+    resource_name = models.CharField(verbose_name="resource name", max_length=256, default="")
     workshop = models.ForeignKey(Workshop, null=True, on_delete=models.PROTECT)
     name = models.CharField(verbose_name="environment name", max_length=255, default="")
     uid = models.CharField(verbose_name="resource uid", max_length=255, default="")

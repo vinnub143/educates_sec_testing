@@ -280,7 +280,12 @@ def shutdown_workshop_environments(training_portal, workshops):
 
     """
 
-    workshop_names = set(map(itemgetter("name"), workshops))
+    # workshop_names = set(map(itemgetter("name"), workshops))
+
+    workshop_names = set()
+
+    for workshop in workshops:
+        workshop_names.add(workshop.get("alias", "") or workshop["name"])
 
     environments = training_portal.active_environments()
 
@@ -389,7 +394,9 @@ def update_workshop_environments(training_portal, workshops):
     """Updates configuration of any workshops which already exist."""
 
     for position, workshop in enumerate(workshops, 1):
-        environment = training_portal.environment_for_workshop(workshop["name"])
+        workshop_name = workshop.get("alias", "") or workshop["name"]
+
+        environment = training_portal.environment_for_workshop(workshop_name)
 
         if environment:
             labels = {}
@@ -436,9 +443,13 @@ def process_workshop_environment(portal, workshop, position):
     """
 
     # First see if there is already a workshop environment for the workshop.
-    # If there is we don't want to be creating a second one.
+    # If there is we don't want to be creating a second one. The name used to
+    # identify the workshop is the resource name by default, but if the workshop
+    # has an alias, then that is used instead.
 
-    environment = portal.environment_for_workshop(workshop["name"])
+    workshop_name = workshop.get("alias", "") or workshop["name"]
+
+    environment = portal.environment_for_workshop(workshop_name)
 
     if environment:
         return
@@ -462,7 +473,8 @@ def process_workshop_environment(portal, workshop, position):
 
     environment = Environment(
         portal=portal,
-        workshop_name=workshop["name"],
+        workshop_name=workshop_name,
+        resource_name=workshop["name"],
         position=position,
         capacity=workshop["capacity"],
         initial=workshop["initial"],
@@ -603,7 +615,8 @@ def replace_workshop_environment(environment):
     # the existing one as stopping as it clears various values.
 
     workshop = {
-        "name": environment.workshop_name,
+        "name": environment.resource_name,
+        "alias": environment.workshop_name,
         "capacity": environment.capacity,
         "initial": environment.initial,
         "reserved": environment.reserved,

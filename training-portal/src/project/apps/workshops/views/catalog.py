@@ -186,7 +186,8 @@ def catalog_environments(request):
         details["state"] = EnvironmentState(environment.state).name
 
         details["workshop"] = {
-            "name": environment.workshop.name,
+            "name": environment.workshop_name,
+            "resource": environment.resource_name,
             "title": environment.workshop.title,
             "description": environment.workshop.description,
             "vendor": environment.workshop.vendor,
@@ -278,7 +279,8 @@ def catalog_workshops(request):
         labels.update(environment.labels)
 
         details = {
-            "name": environment.workshop.name,
+            "name": environment.workshop_name,
+            "resource": environment.resource_name,
             "title": environment.workshop.title,
             "description": environment.workshop.description,
             "vendor": environment.workshop.vendor,

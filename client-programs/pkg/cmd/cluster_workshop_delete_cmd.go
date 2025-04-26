@@ -4,9 +4,9 @@ import (
 	"context"
 
 	yttcmd "carvel.dev/ytt/pkg/cmd/template"
+	"github.com/educates/educates-training-platform/client-programs/pkg/cluster"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"github.com/educates/educates-training-platform/client-programs/pkg/cluster"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -16,6 +16,7 @@ import (
 type ClusterWorkshopDeleteOptions struct {
 	KubeconfigOptions
 	Name            string
+	Alias           string
 	Path            string
 	Portal          string
 	WorkshopFile    string
@@ -72,7 +73,7 @@ func (o *ClusterWorkshopDeleteOptions) Run() error {
 
 	// Delete the deployed workshop from the Kubernetes cluster.
 
-	err = deleteWorkshopResource(dynamicClient, name, o.Portal)
+	err = deleteWorkshopResource(dynamicClient, name, o.Alias, o.Portal)
 
 	if err != nil {
 		return err
@@ -97,6 +98,13 @@ func (p *ProjectInfo) NewClusterWorkshopDeleteCmd() *cobra.Command {
 		"n",
 		"",
 		"name to be used for the workshop definition, generated if not set",
+	)
+	c.Flags().StringVarP(
+		&o.Alias,
+		"alias",
+		"a",
+		"",
+		"alias to be used to identify the workshop by the training portal",
 	)
 	c.Flags().StringVarP(
 		&o.Path,
@@ -180,7 +188,7 @@ func (p *ProjectInfo) NewClusterWorkshopDeleteCmd() *cobra.Command {
 	return c
 }
 
-func deleteWorkshopResource(client dynamic.Interface, name string, portal string) error {
+func deleteWorkshopResource(client dynamic.Interface, name string, alias string, portal string) error {
 	trainingPortalClient := client.Resource(trainingPortalResource)
 
 	trainingPortal, err := trainingPortalClient.Get(context.TODO(), portal, metav1.GetOptions{})
@@ -202,7 +210,7 @@ func deleteWorkshopResource(client dynamic.Interface, name string, portal string
 	for _, item := range workshops {
 		object := item.(map[string]interface{})
 
-		if object["name"] != name {
+		if object["name"] != name || object["alias"] != alias {
 			updatedWorkshops = append(updatedWorkshops, object)
 		} else {
 			found = true
