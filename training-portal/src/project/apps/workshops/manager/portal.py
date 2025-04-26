@@ -467,29 +467,32 @@ def workshop_event(event, body, **_):  # pylint: disable=unused-argument
     if not portal.update_workshop:
         return
 
-    # Find any workshop environment which is starting up or running which
+    # Find any workshop environments which is starting up or running which
     # uses the workshop definition. Note that the workshop may not yet
     # have been linked to the environment so need to also check for that.
 
-    environment = portal.environment_for_workshop(resource.name)
+    # environment = portal.environment_for_workshop(resource.name)
 
-    if not environment or not environment.workshop:
-        return
+    environments = portal.environments_for_resource(resource.name)
 
-    # If the workshop definition identity and generation are the same we do
-    # not need to do anything.
+    for environment in environments:
+        if not environment or not environment.workshop:
+            return
 
-    if (
-        environment.workshop.uid == resource.metadata.uid
-        and environment.workshop.generation == resource.metadata.generation
-    ):
-        return
+        # If the workshop definition identity and generation are the same we do
+        # not need to do anything.
 
-    # Trigger replacement of the workshop environment with a new one.
+        if (
+            environment.workshop.uid == resource.metadata.uid
+            and environment.workshop.generation == resource.metadata.generation
+        ):
+            return
 
-    logger.info("Trigger replacement of workshop environment %s.", environment.name)
+        # Trigger replacement of the workshop environment with a new one.
 
-    replace_workshop_environment(environment)
+        logger.info("Trigger replacement of workshop environment %s.", environment.name)
+
+        replace_workshop_environment(environment)
 
 
 def initialize_portal():

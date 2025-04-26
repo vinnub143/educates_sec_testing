@@ -6,9 +6,9 @@ import (
 	"os"
 	"text/tabwriter"
 
+	"github.com/educates/educates-training-platform/client-programs/pkg/cluster"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-	"github.com/educates/educates-training-platform/client-programs/pkg/cluster"
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -66,7 +66,7 @@ func (o *ClusterWorkshopsListOptions) Run() error {
 
 	defer w.Flush()
 
-	fmt.Fprintf(w, "%s\t%s\t%s\n", "NAME", "CAPACITY", "SOURCE")
+	fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", "NAME", "ALIAS", "CAPACITY", "SOURCE")
 
 	workshopsClient := dynamicClient.Resource(workshopResource)
 
@@ -96,7 +96,7 @@ func (o *ClusterWorkshopsListOptions) Run() error {
 			}
 		}
 
-		fmt.Fprintf(w, "%s\t%s\t%s\n", object["name"], capacityField, source)
+		fmt.Fprintf(w, "%s\t%s\t%s\t%s\n", object["name"], object["alias"], capacityField, source)
 	}
 
 	return nil

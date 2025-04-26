@@ -93,6 +93,8 @@ class EnvironmentAdmin(admin.ModelAdmin):
         "workshop_link",
         "name",
         "uid",
+        "workshop_name",
+        "resource_name",
         "created_at",
         "position",
         "expires",
