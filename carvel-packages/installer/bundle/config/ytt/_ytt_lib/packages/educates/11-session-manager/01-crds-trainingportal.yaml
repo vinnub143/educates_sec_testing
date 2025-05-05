@@ -253,6 +253,9 @@ spec:
                     properties:
                       name:
                         type: string
+                        minLength: 1
+                      alias:
+                        type: string
                       labels:
                         type: array
                         items:

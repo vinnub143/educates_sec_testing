@@ -1,6 +1,4 @@
-"""Application database models for Django.
-
-"""
+"""Application database models for Django."""
 
 import json
 import enum
@@ -173,6 +171,24 @@ class TrainingPortal(models.Model):
             )
         except Environment.DoesNotExist:
             pass
+
+    def environments_for_resource(self, name):
+        """Returns any current active workshop environments for the named
+        resource. These can be a running workshop environment or one which
+        is in the process of being setup. If trying to determine if a new
+        workshop session can be created against it, you need to separately
+        check whether it is in the running state. Will return empty list if
+        there are no matching environments.
+
+        """
+
+        return self.environment_set.filter(
+            resource_name=name,
+            state__in=(
+                EnvironmentState.STARTING,
+                EnvironmentState.RUNNING,
+            ),
+        )
 
     def workshop_environment(self, name):
         """Returns the named workshop environment. This can be a running
@@ -353,6 +369,31 @@ class TrainingPortal(models.Model):
             state=SessionState.STOPPED
         )
 
+    def stopped_session(self, name, user=None):
+        """Returns any stopped workshop session with the specified name.
+        Optionally validates whether allocated to the specified user and
+        only returns the workshop session if it is.
+
+        """
+
+        try:
+            session = Session.objects.get(
+                name=name,
+                environment__portal=self,
+                state__in=(
+                    SessionState.STOPPED,
+                ),
+            )
+            if user:
+                if session.owner == user:
+                    return session
+
+            else:
+                return session
+
+        except Session.DoesNotExist:
+            pass
+
     def session_permitted_for_user(self, user):
         """Returns where the specified user is permitted to create a workshop
         session. If the user is staff, they are always permitted. For non
@@ -412,6 +453,7 @@ class EnvironmentState(enum.IntEnum):
 class Environment(models.Model):
     portal = models.ForeignKey(TrainingPortal, on_delete=models.PROTECT)
     workshop_name = models.CharField(verbose_name="workshop name", max_length=256)
+    resource_name = models.CharField(verbose_name="resource name", max_length=256, default="")
     workshop = models.ForeignKey(Workshop, null=True, on_delete=models.PROTECT)
     name = models.CharField(verbose_name="environment name", max_length=255, default="")
     uid = models.CharField(verbose_name="resource uid", max_length=255, default="")
@@ -426,21 +468,15 @@ class Environment(models.Model):
     expires = models.DurationField(
         verbose_name="workshop duration", default=timedelta()
     )
-    overtime = models.DurationField(
-        verbose_name="overtime period", default=timedelta()
-    )
+    overtime = models.DurationField(verbose_name="overtime period", default=timedelta())
     deadline = models.DurationField(
         verbose_name="maximum deadline", default=timedelta()
     )
     orphaned = models.DurationField(
         verbose_name="inactivity timeout", default=timedelta()
     )
-    overdue = models.DurationField(
-        verbose_name="startup timeout", default=timedelta()
-    )
-    refresh = models.DurationField(
-        verbose_name="refresh interval", default=timedelta()
-    )
+    overdue = models.DurationField(verbose_name="startup timeout", default=timedelta())
+    refresh = models.DurationField(verbose_name="refresh interval", default=timedelta())
     registry = JSONField(verbose_name="registry override", default={})
     env = JSONField(verbose_name="environment overrides", default=[])
     labels = JSONField(verbose_name="label overrides", default={})
@@ -622,10 +658,16 @@ class Session(models.Model):
     created = models.DateTimeField(null=True, blank=True)
     started = models.DateTimeField(null=True, blank=True)
     expires = models.DateTimeField(null=True, blank=True)
-    token = models.CharField(verbose_name="activation token", max_length=256, null=True, blank=True)
+    token = models.CharField(
+        verbose_name="activation token", max_length=256, null=True, blank=True
+    )
     url = models.URLField(verbose_name="session url", null=True)
     params = JSONField(verbose_name="session params", default={})
-    password = models.CharField(verbose_name="config password", max_length=256, null=True, blank=True)
+    password = models.CharField(
+        verbose_name="config password", max_length=256, null=True, blank=True
+    )
+    index_url = models.URLField(verbose_name="index url", null=True, blank=True)
+    analytics_url = models.URLField(verbose_name="analytics url", null=True, blank=True)
 
     def environment_name(self):
         return self.environment.name

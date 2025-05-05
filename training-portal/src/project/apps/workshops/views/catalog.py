@@ -25,11 +25,6 @@ from ..models import TrainingPortal, EnvironmentState, SessionState
 def catalog(request):
     """Renders the list of workshops available in web interface."""
 
-    index_url = request.session.get("index_url")
-
-    if index_url:
-        return redirect(index_url)
-
     if not request.user.is_staff and settings.PORTAL_INDEX:
         return redirect(settings.PORTAL_INDEX)
 
@@ -191,7 +186,8 @@ def catalog_environments(request):
         details["state"] = EnvironmentState(environment.state).name
 
         details["workshop"] = {
-            "name": environment.workshop.name,
+            "name": environment.workshop_name,
+            "resource": environment.resource_name,
             "title": environment.workshop.title,
             "description": environment.workshop.description,
             "vendor": environment.workshop.vendor,
@@ -283,7 +279,8 @@ def catalog_workshops(request):
         labels.update(environment.labels)
 
         details = {
-            "name": environment.workshop.name,
+            "name": environment.workshop_name,
+            "resource": environment.resource_name,
             "title": environment.workshop.title,
             "description": environment.workshop.description,
             "vendor": environment.workshop.vendor,

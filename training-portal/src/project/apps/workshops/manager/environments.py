@@ -280,12 +280,29 @@ def shutdown_workshop_environments(training_portal, workshops):
 
     """
 
-    workshop_names = set(map(itemgetter("name"), workshops))
+    # When looking for workshop environments to delete, we compare using a key
+    # which is the workshop name and resource name. The resource name is always
+    # the name of the corresponding Workshop resource. The workshop name is
+    # either the name of the workshop or the alias if it has one. By checking a
+    # combination of both we ensure we delete a workshop environment where the
+    # linked Workshop resource name has changed but the alias hasn't.
+
+    workshop_names = set()
+
+    for workshop in workshops:
+        workshop_name = workshop.get("alias", "") or workshop["name"]
+        resource_name = workshop["name"]
+
+        workshop_key = f"{workshop_name}:{resource_name}"
+
+        workshop_names.add(workshop_key)
 
     environments = training_portal.active_environments()
 
     for environment in environments:
-        if environment.workshop_name not in workshop_names:
+        workshop_key = f"{environment.workshop_name}:{environment.resource_name}"
+
+        if workshop_key not in workshop_names:
             # Mark the workshop environment as stopping. Next mark as stopping
             # any workshop sessions which were being kept in reserve for the
             # workshop environment so that they are deleted. We mark the
@@ -389,7 +406,9 @@ def update_workshop_environments(training_portal, workshops):
     """Updates configuration of any workshops which already exist."""
 
     for position, workshop in enumerate(workshops, 1):
-        environment = training_portal.environment_for_workshop(workshop["name"])
+        workshop_name = workshop.get("alias", "") or workshop["name"]
+
+        environment = training_portal.environment_for_workshop(workshop_name)
 
         if environment:
             labels = {}
@@ -436,9 +455,13 @@ def process_workshop_environment(portal, workshop, position):
     """
 
     # First see if there is already a workshop environment for the workshop.
-    # If there is we don't want to be creating a second one.
+    # If there is we don't want to be creating a second one. The name used to
+    # identify the workshop is the resource name by default, but if the workshop
+    # has an alias, then that is used instead.
 
-    environment = portal.environment_for_workshop(workshop["name"])
+    workshop_name = workshop.get("alias", "") or workshop["name"]
+
+    environment = portal.environment_for_workshop(workshop_name)
 
     if environment:
         return
@@ -462,7 +485,8 @@ def process_workshop_environment(portal, workshop, position):
 
     environment = Environment(
         portal=portal,
-        workshop_name=workshop["name"],
+        workshop_name=workshop_name,
+        resource_name=workshop["name"],
         position=position,
         capacity=workshop["capacity"],
         initial=workshop["initial"],
@@ -603,7 +627,8 @@ def replace_workshop_environment(environment):
     # the existing one as stopping as it clears various values.
 
     workshop = {
-        "name": environment.workshop_name,
+        "name": environment.resource_name,
+        "alias": environment.workshop_name,
         "capacity": environment.capacity,
         "initial": environment.initial,
         "reserved": environment.reserved,

@@ -4,7 +4,7 @@ import logging
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Dict, List, Tuple, Union
 
-from aiohttp import BasicAuth, ClientSession, ClientConnectorError
+from aiohttp import BasicAuth, ClientSession, ClientConnectorError, ClientError
 
 from .clusters import ClusterConfig
 
@@ -311,8 +311,12 @@ class TrainingPortalClientSession:
         self,
         environment_name: str,
         user_id: str,
+        user_email: str,
+        user_first_name: str,
+        user_last_name: str,
         parameters: List[Dict[str, str]],
         index_url: str,
+        analytics_url: str,
     ) -> Dict[str, str] | None:
         """Request a workshop session for a user."""
 
@@ -327,7 +331,11 @@ class TrainingPortalClientSession:
                 headers=headers,
                 params={
                     "user": user_id,
+                    "email": user_email,
+                    "first_name": user_first_name,
+                    "last_name": user_last_name,
                     "index_url": index_url,
+                    "analytics_url": analytics_url,
                 },
                 json={"parameters": parameters},
             ) as response:
@@ -365,4 +373,21 @@ class TrainingPortalClientSession:
                 self.portal.cluster.name,
                 user_id,
                 exc,
+            )
+
+        except ClientError as exc:
+            logger.error(
+                "Failed to request workshop session from portal %s of cluster %s for user %s: %s",
+                self.portal.name,
+                self.portal.cluster.name,
+                user_id,
+                exc,
+            )
+
+        except Exception as exc:
+            logger.exception(
+                "Unexpected exception when requesting workshop session from portal %s of cluster %s for user %s",
+                self.portal.name,
+                self.portal.cluster.name,
+                user_id,
             )

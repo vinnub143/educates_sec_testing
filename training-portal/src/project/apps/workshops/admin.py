@@ -93,6 +93,8 @@ class EnvironmentAdmin(admin.ModelAdmin):
         "workshop_link",
         "name",
         "uid",
+        "workshop_name",
+        "resource_name",
         "created_at",
         "position",
         "expires",
@@ -172,6 +174,8 @@ class SessionAdmin(admin.ModelAdmin):
         "expires",
         "url_link",
         "params",
+        "index_url",
+        "analytics_url",
     ]
 
     def has_add_permission(self, request):

@@ -34,6 +34,24 @@ spec:
 
 When the training portal is created, it will setup the underlying workshop environments, create any workshop instances required to be created initially for each workshop, and deploy a web portal for attendees of the training to access their workshop instances.
 
+When requesting workshop sessions via the REST API, either the workshop environment name or the workshop name can be used. Using the workshop name is easier as the name of the workshop environment can change over time if it is refreshed or replaced, and a client would also need to search itself through the workshop environments to find that for the desired workshop name. The name of the workshop though, because it is the name of the ``Workshop`` resource, may be cryptic if the name incorporates versioning information. To make lookup of a workshop easier via the REST API, the ``alias`` property can be supplied which maps the published name for the workshop to an alternate value. The ``alias`` can if desired use mixed case, punctuation and spaces. Whether ``name`` or ``alias`` is used, they must be unique across the set of workshops hosted by the training portal.
+
+```yaml
+apiVersion: training.educates.dev/v1beta1
+kind: TrainingPortal
+metadata:
+  name: sample-workshops
+spec:
+  portal:
+    sessions:
+      maximum: 8
+  workshops:
+  - name: lab-asciidoc-sample-v1
+    alias: lab-asciidoc-sample
+  - name: lab-markdown-sample-v2
+    alias: lab-markdown-sample
+```
+
 Note that you should never use a name for a training portal which starts with a ``kube-`` prefix. This is because namespaces are created using the name of the training portal as prefix and the ``kube-`` prefix on namespace names is reserved for Kubernetes system namespaces. Although the names used may not actually clash with any used by Kubernetes at the current time, you will see issues with the Educates secrets manager, which will not apply rules when the name of namespace is seen as being one reserved for Kubernetes system namespaces. This is a fail safe to make sure Educates doesn't interfere with anything running out of the Kubernetes system namespaces. An example of what may result is that when a workshop has enabled the per session image registry, the image registry pull secret will not be injected into the ``default`` service account as this behaviour relies on a single generic rule that looks at all namespaces (excluding Kubernetes reserved namespaces), rather than a rule per workshop session where the name of the namespace is given explicitly.
 
 Limiting the number of sessions
@@ -433,10 +451,10 @@ If you want to override any environment variables for workshop instances created
 ```yaml
 spec:
   workshops:
-  - name: lab-markdown-sample
+  - name: lab-coding-sample
     env:
-    - name: REPOSITORY_URL
-      value: https://github.com/educates/lab-markdown-sample
+    - name: PROGRAMMING_LANGUAGE
+      value: Java
 ```
 
 Values of fields in the list of resource objects can reference a number of pre-defined parameters. The available parameters are:
@@ -455,6 +473,25 @@ Values of fields in the list of resource objects can reference a number of pre-d
 * ``platform_arch`` - The CPU architecture the workshop container is running on, ``amd64`` or ``arm64``.
 
 The syntax for referencing one of the parameters is ``$(parameter_name)``.
+
+If needed, you can use the ``alias`` property to create multiple different workshop environments using the same ``Workshop`` definition, but with different ``env`` values to customize the workshop.
+
+```yaml
+spec:
+  workshops:
+  - name: lab-coding-sample
+    alias: lab-java-sample
+    env:
+    - name: PROGRAMMING_LANGUAGE
+      value: Java
+  - name: lab-coding-sample
+    alias: lab-python-sample
+    env:
+    - name: PROGRAMMING_LANGUAGE
+      value: Python
+```
+
+The ``alias`` property needs to be set to different values for each workshop in this case as the ``name`` property otherwise would need to be unique for each across all workshop necessitating two separate copies of the ``Workshop`` definition.
 
 Overriding portal credentials
 -----------------------------
