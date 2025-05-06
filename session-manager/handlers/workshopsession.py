@@ -2260,23 +2260,27 @@ def workshop_session_create(name, body, meta, uid, spec, status, patch, retry, *
         dockerd_image = DOCKER_IN_DOCKER_IMAGE
         dockerd_image_pull_policy = image_pull_policy(dockerd_image)
 
-        dockerd_args = [
-            "/bin/sh",
-            "-c",
-            f"mkdir -p /var/run/workshop && ln -s /var/run/workshop/docker.sock /var/run/docker.sock && (test -f /usr/local/share/ca-certificates/Cluster_Ingress_CA.crt && /usr/sbin/update-ca-certificates || true) && dockerd --host=unix:///var/run/workshop/docker.sock --mtu={DOCKERD_MTU}",
-        ]
+        # Build args for dockerd daemon ahead of inection into the pod's args list
+
+        dockerd_daemon_args = ["--host=unix:///var/run/workshop/docker.sock", f"--mtu={DOCKERD_MTU}"]
 
         if applications.is_enabled("registry"):
             if not INGRESS_SECRET:
-                dockerd_args.append(f"--insecure-registry={registry_host}")
+                dockerd_daemon_args.append(f"--insecure-registry={registry_host}")
 
         if DOCKERD_MIRROR_REMOTE:
-            dockerd_args.extend(
+            dockerd_daemon_args.extend(
                 [
                     f"--insecure-registry={workshop_namespace}-mirror",
                     f"--registry-mirror=http://{workshop_namespace}-mirror:5000",
                 ]
             )
+
+        dockerd_args = [
+            "/bin/sh",
+            "-c",
+            f"mkdir -p /var/run/workshop && ln -s /var/run/workshop/docker.sock /var/run/docker.sock && (test -f /usr/local/share/ca-certificates/Cluster_Ingress_CA.crt && /usr/sbin/update-ca-certificates || true) && dockerd {' '.join(dockerd_daemon_args)}",
+        ]
 
         docker_container = {
             "name": "docker",
