@@ -87,7 +87,12 @@ def purge_expired_workshop_sessions():
 
                 delete_workshop_session(session).schedule()
 
-            elif session.environment.orphaned:
+            elif session.environment.orphaned and not session.is_pending():
+                # Note that we exclude pending sessions which are not yet marked
+                # as running and are waiting to be activated. If we don't ignore
+                # these, a reserved session which has been running for a while,
+                # will be incorrectly seen as orhpaned.
+
                 try:
                     # Query the idle time from the workshop session instance.
                     # Use the internal Kubernetes service for accessing the
