@@ -95,7 +95,7 @@ class EnvironmentAdmin(admin.ModelAdmin):
         "uid",
         "workshop_name",
         "resource_name",
-        "created_at",
+        "created_timestamp",
         "position",
         "expires",
         "overtime",
@@ -121,6 +121,11 @@ class EnvironmentAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+    def created_timestamp(self, obj):
+        return obj.created_at.strftime('%Y-%m-%d %H:%M:%S')
+
+    created_timestamp.short_description = 'Created at'
 
     actions = [
         "refresh_environments",
@@ -169,9 +174,9 @@ class SessionAdmin(admin.ModelAdmin):
         "environment_link",
         "state",
         "owner",
-        "created",
-        "started",
-        "expires",
+        "created_timestamp",
+        "started_timestamp",
+        "expires_timestamp",
         "url_link",
         "params",
         "index_url",
@@ -186,6 +191,21 @@ class SessionAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return False
+
+    def created_timestamp(self, obj):
+        return obj.created.strftime('%Y-%m-%d %H:%M:%S')
+
+    created_timestamp.short_description = 'Created at'
+
+    def started_timestamp(self, obj):
+        return obj.started.strftime('%Y-%m-%d %H:%M:%S')
+
+    started_timestamp.short_description = 'Started at'
+
+    def expires_timestamp(self, obj):
+        return obj.expires.strftime('%Y-%m-%d %H:%M:%S')
+
+    expires_timestamp.short_description = 'Started at'
 
     actions = [
         "expire_sessions",
