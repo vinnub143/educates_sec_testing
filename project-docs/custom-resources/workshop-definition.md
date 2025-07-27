@@ -48,7 +48,8 @@ spec:
   tags:
   - template
   labels:
-    id: educates.dev/lab-markdown-sample
+  - name: id
+    value: educates.dev/lab-markdown-sample
   logo: data:image/png;base64,....
 ```
 
