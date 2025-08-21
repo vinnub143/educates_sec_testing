@@ -31,6 +31,10 @@ Features Changed
 
 * Docker images, including workshop base images, updated to use Fedora 42.
 
+* Updated versions of Java 8, 11, 17 and 21. Maven has also been updated to
+  latest available at this time. Gradle remains at version 8.5 for Java 8, 11,
+  and 17, and version 8.8 for Java 21, due to build issues.
+
 Bugs Fixed
 ----------
 
