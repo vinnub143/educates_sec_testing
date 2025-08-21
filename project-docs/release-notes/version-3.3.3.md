@@ -27,6 +27,8 @@ Features Changed
   variable. If a workshop has issues when standard location is used, it will
   need to override it as part of workshop.
 
+* Update Anaconda Python versions in ``conda-environment`` workshop base image.
+
 Bugs Fixed
 ----------
 
