@@ -857,7 +857,7 @@ spec:
             volumes:
             - name: disk1
               containerDisk:
-                image: $(oci_image_cache)/containerdisks/fedora:41
+                image: $(oci_image_cache)/containerdisks/fedora:42
             - name: cloudinitdisk
               cloudInitConfigDrive:
                 userData: |-
