@@ -15,7 +15,7 @@ RUN <<EOF
     ARCHNAME_amd64=x64
     ARCHNAME_arm64=aarch64
     ARCHNAME=ARCHNAME_${TARGETARCH}
-    CHECKSUM_amd64="2e83ac152fb315db0d667761f2120b64504800f641a513044e834a1a41f29bc0"
+    CHECKSUM_amd64="166774efcf0f722f2ee18eba0039de2d685b350ee14d7b69e6f83437dafd2af1"
     CHECKSUM_arm64="423416447885d9e45f96dd9e0b2c1367da5e1b0353e187cfdf9388c9820ac147"
     CHECKSUM=CHECKSUM_${TARGETARCH}
     curl --fail -sL -o /tmp/jdk17.tar.gz https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.16%2B8/OpenJDK17U-jdk_${!ARCHNAME}_linux_hotspot_17.0.16_8.tar.gz
