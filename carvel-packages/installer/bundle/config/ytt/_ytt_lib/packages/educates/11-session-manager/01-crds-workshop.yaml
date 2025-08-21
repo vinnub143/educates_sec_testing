@@ -1061,6 +1061,8 @@ spec:
                             type: string
                           port:
                             type: integer
+                          path:
+                            type: string
                           changeOrigin:
                             type: boolean
                           secure:
