@@ -29,6 +29,8 @@ Features Changed
 
 * Update Anaconda Python versions in ``conda-environment`` workshop base image.
 
+* Docker images, including workshop base images, updated to use Fedora 42.
+
 Bugs Fixed
 ----------
 
