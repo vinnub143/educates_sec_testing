@@ -1,5 +1,10 @@
+# Set prompt to working directory.
 
 export PS1="[\w] $ "
+
+# Set default editor for tools that need it.
+
+export EDITOR=/usr/bin/vim
 
 # Enable kubectl bash completion.
 
