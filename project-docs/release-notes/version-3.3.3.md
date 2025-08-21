@@ -1,6 +1,18 @@
 Version 3.3.3
 =============
 
+New Features
+------------
+
+* Added a ``baseurl`` short code for when using Hugo. This will resolve to
+  ``/workshop/content`` URL path, which is where workshop instructions reside.
+  This short code is to avoid hard coding ``/workshop/content`` when adding
+  images to the ``static`` directory and referring to them from markdown. This
+  will allow the URL path workshop instructions appear under to be modified at
+  some point or when generating them in a different way, for example, to create
+  an offline set of HTML static files for viewing. For more information see
+  [Embedding images and static assets](embedding-images-and-static-assets).
+
 Features Changed
 ----------------
 
