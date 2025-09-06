@@ -48,7 +48,8 @@ spec:
   tags:
   - template
   labels:
-    id: educates.dev/lab-markdown-sample
+  - name: id
+    value: educates.dev/lab-markdown-sample
   logo: data:image/png;base64,....
 ```
 
@@ -856,7 +857,7 @@ spec:
             volumes:
             - name: disk1
               containerDisk:
-                image: $(oci_image_cache)/containerdisks/fedora:41
+                image: $(oci_image_cache)/containerdisks/fedora:42
             - name: cloudinitdisk
               cloudInitConfigDrive:
                 userData: |-
